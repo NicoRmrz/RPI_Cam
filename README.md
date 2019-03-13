@@ -10,4 +10,4 @@ Raspberry Pi camera with full tilt-servos
  # Software:
  RPI_Cam git repository. 
  
- 1. Run RPICam_GUI_Main
+ 1. Run RPICam_GUI_Main.py
