@@ -1,0 +1,20 @@
+from picamera import PiCamera, Color
+from picamera.array import PiRGBArray
+from time import sleep
+
+
+class Setup_PiCam(object):
+        def __init__(self):
+                self.camera = None
+                  
+        # Instantiate PiCamera module
+        def PiCam_Configuration(self):
+                self.camera = PiCamera()  
+                self.camera.rotation = 180
+                
+                # allow the camera to warmup
+                sleep(0.1)
+                
+                return self.camera
+                
+
