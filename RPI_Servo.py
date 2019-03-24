@@ -40,6 +40,7 @@ class QServoHorizontalThread(QThread):
         self.exitProgram = False
         self.left = False
         self.right = False
+        self.setYPOS = False
         self.horizontalPosition = horizontal_pos
         
         self.upDownMotor = self.PiServo.upDownMotor
@@ -62,6 +63,11 @@ class QServoHorizontalThread(QThread):
         else:
             self.horizontalPosition = self.horizontalPosition
                
+    # Set track pad Y position
+    def set_Y_POS(self, setY, Y):
+        self.setYPOS = setY
+        self.yPosition = Y
+    
     # Sets up the program to exit when the main window is shutting down
     def Set_Exit_Program(self, exiter):
         self.exitProgram = exiter
@@ -70,7 +76,12 @@ class QServoHorizontalThread(QThread):
     def run(self):
 
         while(1):
-                      
+            
+            # Set Y value of track pad to servo position
+            if self.setYPOS != False:
+                self.leftRightMotor.angle = self.yPosition
+                self.setYPOS = False
+            
             #Set for left key "A" to move camera left
             if self.left != False:
                 if (self.horizontalPosition >=0 and self.horizontalPosition <= 180):
@@ -127,6 +138,7 @@ class QServoVerticalThread(QThread):
         self.exitProgram = False
         self.up = False
         self.down = False
+        self.setXPOS = False
         self.horizontalPosition = horizontal_pos
         self.verticalPosition = vertical_pos
         
@@ -149,6 +161,11 @@ class QServoVerticalThread(QThread):
             self.verticalPosition = self.verticalPosition + 1
         else:
             self.verticalPosition = self.verticalPosition
+            
+    # Set track pad Y position
+    def set_X_POS(self, setX, X):
+        self.setXPOS = setX
+        self.xPosition = X
 
     # Sets up the program to exit when the main window is shutting down
     def Set_Exit_Program(self, exiter):
@@ -158,6 +175,11 @@ class QServoVerticalThread(QThread):
     def run(self):
 
         while(1):
+            
+            # Set Y value of track pad to servo position
+            if self.setXPOS != False:
+                self.upDownMotor.angle = self.xPosition
+                self.setXPOS = False
             
             #Set for left key "W" to move camera up
             if self.up != False:

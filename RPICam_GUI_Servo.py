@@ -7,17 +7,22 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
 
 # QT GUI class for the mouse freelook feature for the Pi Camera
 class MouseTracker(QLabel):
-        def __init__(self):
+        def __init__(self, window, horizontalThread, verticalThread):
                 super().__init__()
+                self.setParent(window)
+                self.leftRightServoThread = horizontalThread
+                self.upDownServoThread = verticalThread
                 x = 0
                 y = 0
        
         def mouseMoveEvent(self, event):
-                x = round(event.x() / 2)
-                y = round(event.y() / 2)
+                x = round(180-(event.x() / 2))
+                y = round((event.y() / 2) + 10)
                 QToolTip.showText(QCursor.pos(), str(x) + "," + str(y))
-                #Set thread
                 
+                #Set thread
+                self.leftRightServoThread.set_Y_POS(True, x)
+                self.upDownServoThread.set_X_POS(True, y)
                         
 class Left_Button(QPushButton):
     def __init__(self, window, text, thread):
@@ -62,51 +67,5 @@ class Down_Button(QPushButton):
     # Function call for the click event
     def On_Click(self):
         self.servoThread.set_downButton(True)
-                
-class upDown_Slider(QSlider):         #Up Down servo Slider
-
-    # Initializes the necessary objects into the slider class for control
-    def __init__(self, window, thread):
-        super(upDown_Slider, self).__init__()
-        self.setParent(window)
-        self.thread = thread
-        
-        # Connect done signal to function
-        self.thread.upDown_Sig.connect(self.sliderDone)
-
-    # Function for recieving new value from slider
-    def changeValue(self, value):
-        self.newValue = str(value)
-        QToolTip.showText(QCursor.pos(), self.newValue)
-        self.thread.set_upDownSlider(True, value)
-        
-    # Function for "Done" after slider change
-    def sliderDone(self, value):
-        #~ print ("Up - Down: ", value)    
-        pass
-        
-        
-        
-class leftRight_Slider(QSlider):         #Left right servo Slider
-
-    # Initializes the necessary objects into the slider class for control
-    def __init__(self, window, thread):
-        super(leftRight_Slider, self).__init__()
-        self.setParent(window)
-        self.thread = thread
-        
-        # Connect done signal to function
-        self.thread.leftRight_Sig.connect(self.sliderDone)
-
-    # Function for recieving new value from slider
-    def changeValue(self, value):
-        self.newValue = str(value)
-        QToolTip.showText(QCursor.pos(), self.newValue)
-        self.thread.set_leftRightSlider(True, value)
-        
-    # Function for "Done" after slider change
-    def sliderDone(self, value):
-        #~ print ("Left - Right: ", value)
-        pass
-        
+ 
 

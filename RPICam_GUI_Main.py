@@ -159,7 +159,8 @@ class Button_Reset_Handler(QObject):
                         elif value =='Max':
                                 self.statusBar.showMessage("Max LEFT Movement Reached!", 2000) 
                         else:
-                                self.xPos.setText("| X: " + value)  
+                                newVal = 180 - int(value)
+                                self.xPos.setText("| X: " + str(newVal))
                         
                 elif string == 'verticalMotor':
                         if value == 'Min':
@@ -168,7 +169,8 @@ class Button_Reset_Handler(QObject):
                         elif value =='Max':
                                 self.statusBar.showMessage("Max DOWN Movement Reached!", 2000) 
                         else:
-                                self.yPos.setText("| Y: " + value)
+                                newVal = 180 - int(value)
+                                self.yPos.setText("| Y: " + str(newVal))
         
 # Class to display error messages
 class Error_Handler(QObject):
@@ -808,9 +810,7 @@ class Window(QMainWindow):
         self.resFrmrtDrpDwn.addItem("1640x922 @ 30 fps")
         self.resFrmrtDrpDwn.addItem("1280x720 @ 40 fps")
         self.resFrmrtDrpDwn.addItem("640x480 @ 60 fps")
-        
-        
-        
+
         self.resFrmrtDrpDwn.setStyleSheet(GUI_Style.resolutionFramerate)   
         self.camera.resolution = (1640, 1232)
         self.camera.framerate = 60 
@@ -819,7 +819,7 @@ class Window(QMainWindow):
         '''Freelook tab GUI Objects'''   
     # To create a mouse pad for camera freelook
     def mouseTracker(self):
-        self.mouseTracker = MouseTracker()
+        self.mouseTracker = MouseTracker(self, self.leftRightServoThread, self.upDownServoThread)
         self.mouseTracker.setMaximumSize(360, 340)
         self.mouseTracker.setStyleSheet(GUI_Style.mouseTrackPad)
         self.mouseTracker.setMouseTracking(True)
@@ -829,27 +829,25 @@ class Window(QMainWindow):
     def leftButton(self):
         self.left_btn = Left_Button(self, "Left", self.leftRightServoThread)
         self.left_btn.setStyleSheet(GUI_Style.startButton)
-        self.left_btn.pressed.connect(self.left_btn.On_Click)
-        #~ self.left_btn.setIcon(QIcon(Camera_Idle_Path))
-        #~ self.left_btn.setIconSize(QSize(65, 70))
+        self.left_btn.clicked.connect(self.left_btn.On_Click)
         
     # To create button for right click events
     def rightButton(self):
         self.right_btn = Right_Button(self, "Right", self.leftRightServoThread)
         self.right_btn.setStyleSheet(GUI_Style.startButton)
-        self.right_btn.pressed.connect(self.right_btn.On_Click)
+        self.right_btn.clicked.connect(self.right_btn.On_Click)
         
     # To create button for up click events
     def upButton(self):
         self.up_btn = Up_Button(self, "Up", self.upDownServoThread)
         self.up_btn.setStyleSheet(GUI_Style.startButton)
-        self.up_btn.pressed.connect(self.up_btn.On_Click)
+        self.up_btn.clicked.connect(self.up_btn.On_Click)
         
     # To create button for down click events
     def downButton(self):
         self.down_btn = Down_Button(self, "Down", self.upDownServoThread)
         self.down_btn.setStyleSheet(GUI_Style.startButton)
-        self.down_btn.pressed.connect(self.down_btn.On_Click)
+        self.down_btn.clicked.connect(self.down_btn.On_Click)
 
         
     # Stop all threads when GUI is closed
