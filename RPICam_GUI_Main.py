@@ -25,7 +25,7 @@ from GUI_Stylesheets import GUI_Stylesheets
 from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
-appVersion = "1.5"      # Update version
+appVersion = "1.7"      # Update version
 
 #Initial postion of servos
 horizontal_pos = 90
@@ -196,7 +196,6 @@ class Error_Handler(QObject):
                 self.errorMessage = string
                 self.statusBar.setStyleSheet(GUI_Style.statusBarRed)
                 self.statusBar.showMessage(self.errorMessage, 5000) 
-                #~ self.WriteToConsole(self.errorMessage)
                 
         # Function to continue streams after any errors
         def resetAllStreams(self, string):
@@ -525,7 +524,7 @@ class Window(QMainWindow):
     # Create Window to stream live feed
     def VideoStream(self):
         self.Vid_Stream = Stream_Video(self, self.Video_Stream, self.RPIRecordThread, self.RPICaptureThread, self.RPITimeLapseThread)
-        self.Vid_Stream.setMinimumSize(640, 480)
+        self.Vid_Stream.setMinimumSize(725, 480)
         self.Vid_Stream.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.Vid_Stream.setBackgroundRole(QPalette.Base)
         self.Vid_Stream.setScaledContents(True)
@@ -732,8 +731,8 @@ class Window(QMainWindow):
         self.annotationSldr.setStyleSheet(GUI_Style.annotationSlider)
         self.annotationSldr.setFocusPolicy(Qt.NoFocus)
         self.annotationSldr.setRange(6, 160)
-        self.annotationSldr.setValue(50)
-        self.camera.annotate_text_size = 50
+        self.annotationSldr.setValue(45)
+        self.camera.annotate_text_size = 45
         self.annotationSldr.valueChanged[int].connect(self.annotationSldr.changeValue)
         
     # Image Effect text/ logo
@@ -809,9 +808,12 @@ class Window(QMainWindow):
         self.resFrmrtDrpDwn.addItem("1640x922 @ 30 fps")
         self.resFrmrtDrpDwn.addItem("1280x720 @ 40 fps")
         self.resFrmrtDrpDwn.addItem("640x480 @ 60 fps")
-        self.resFrmrtDrpDwn.setStyleSheet(GUI_Style.resolutionFramerate)
+        
+        
+        
+        self.resFrmrtDrpDwn.setStyleSheet(GUI_Style.resolutionFramerate)   
         self.camera.resolution = (1640, 1232)
-        self.camera.framerate = 30    
+        self.camera.framerate = 60 
         self.resFrmrtDrpDwn.activated[str].connect(self.resFrmrtDrpDwn.resolutionFramerate_Selection)
    
         '''Freelook tab GUI Objects'''   
@@ -913,3 +915,4 @@ if __name__ == "__main__":
 # 1.4 - Added resolution/ Framerate button. Mar 6, 2019
 # 1.5 - Added servo funcationality and tabs for control. Added keyboard keys for control of servos 'WASD' - Mar 11, 2019
 # 1.6 - Added status bar located bottom left - Mar 12, 2019
+# 1.7 - Added thread for smoother motor movements. Removed Sliders tab - Mar 23, 2019

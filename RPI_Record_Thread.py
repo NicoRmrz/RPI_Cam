@@ -1,5 +1,5 @@
 from picamera import PiCamera, Color
-from picamera.exc import PiCameraValueError
+from picamera.exc import PiCameraValueError, PiCameraRuntimeError
 import time
 from time import sleep
 import datetime
@@ -80,12 +80,14 @@ class QRPIRecordVideoThread(QThread):
 				
 					#Set record video
 					if (self.Record_Ready != False and self.Stop_Rec != True and self.Snapshot_Ready != True and self.TimeLapse_Ready != True):
+														
 							try:	
 								# Start recording video
 								currentTime = time.strftime('%Y-%m-%d__%H_%M_%S')
 								Vid_Name_Scheme = Video_Path +"Video_" + currentTime + ".h264"
+							
 								self.camera.start_recording(Vid_Name_Scheme, splitter_port=1)
-								start = datetime.datetime.now()
+								start = datetime.datetime.now()						
 								
 								self.camera.annotate_background = Color('pink')
 								self.camera.annotate_foreground = Color('black')
@@ -130,6 +132,7 @@ class QRPIRecordVideoThread(QThread):
 												
 												finally:	
 													self.ButonResethandler("Capture")
+																					
 													# Exit loop
 													self.Snapshot_Ready = False
 								
@@ -150,19 +153,25 @@ class QRPIRecordVideoThread(QThread):
 		   
 								
 																
-							except PiCameraValueError:
+							except PiCameraValueError as e:
 								self.SendError("Something went wrong with the camera.. Try Again!")
 								self.ButonResethandler("Record")
+								self.Stop_PBar.emit("True")
+								self.ButonResethandler("Stream")
+								
+							except PiCameraRuntimeError as e:
+								self.SendError("Something went wrong with the camera.. Try Again!")
+								print(e)
 								self.Stop_PBar.emit("True")
 								self.ButonResethandler("Stream")
 							
 							finally:	
 								self.camera.stop_recording(splitter_port=1)  
-																
+										
 								# emit saved file name
 								curr_path, filename = ntpath.split(Vid_Name_Scheme)
 								self.Recording_Finished(filename)
-								
+																		
 								# Exit loop
 								self.Record_Ready = False
 						

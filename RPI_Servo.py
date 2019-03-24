@@ -29,8 +29,6 @@ class Initialize_Servo(object):
             self.upDownMotor.actuation_range = 180
             self.leftRightMotor.actuation_range = 180
 
-'''Try Making 2 threads: vertical movement, horizontal movement for smoother movement'''
-
 class QServoHorizontalThread(QThread):
 
     horizontal_Sig = pyqtSignal(str, str)
@@ -52,7 +50,7 @@ class QServoHorizontalThread(QThread):
     def set_leftButton(self, string):
         self.left = string
         if (self.horizontalPosition <= 180): # Set max limit
-            self.horizontalPosition = self.horizontalPosition + 2
+            self.horizontalPosition = self.horizontalPosition + 1
         else:
             self.horizontalPosition = self.horizontalPosition
         
@@ -60,7 +58,7 @@ class QServoHorizontalThread(QThread):
     def set_rightButton(self, string):
         self.right = string
         if (self.horizontalPosition >= 0): # Set min limit
-            self.horizontalPosition = self.horizontalPosition - 2
+            self.horizontalPosition = self.horizontalPosition - 1
         else:
             self.horizontalPosition = self.horizontalPosition
                
@@ -142,13 +140,13 @@ class QServoVerticalThread(QThread):
         if (self.verticalPosition <= 10): # Set min limit
             self.verticalPosition = self.verticalPosition 
         else:
-            self.verticalPosition = self.verticalPosition - 2
+            self.verticalPosition = self.verticalPosition - 1
         
     # Set to move camera down
     def set_downButton(self, string):
         self.down = string
         if (self.verticalPosition <= 180): # Set max limit
-            self.verticalPosition = self.verticalPosition + 2
+            self.verticalPosition = self.verticalPosition + 1
         else:
             self.verticalPosition = self.verticalPosition
 
