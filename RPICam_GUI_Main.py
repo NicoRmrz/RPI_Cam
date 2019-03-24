@@ -22,7 +22,7 @@ from RPI_DropDown_Thread import QDropDownThread
 from Sleeper_Thread import QTimeThread
 from web_stream import WebStream_Thread
 from GUI_Stylesheets import GUI_Stylesheets
-from RPI_Servo import Initialize_Servo, QServoThread
+from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
 appVersion = "1.5"      # Update version
@@ -87,7 +87,7 @@ class Stream_Video(QLabel):
         
 # Class to reset button icons
 class Button_Reset_Handler(QObject):
-        def __init__(self, captureThre, recordThre, timelapseThre, PBarThre, capture, record, timelapse, PBar, vidSteam, servoThre, statusBar, xPosStausbar, yPosStausbar):
+        def __init__(self, captureThre, recordThre, timelapseThre, PBarThre, capture, record, timelapse, PBar, vidSteam, servoHThre, servoVThre, statusBar, xPosStausbar, yPosStausbar):
                 super(Button_Reset_Handler, self).__init__()
                 self.captureThread = captureThre
                 self.recordThread = recordThre
@@ -98,7 +98,8 @@ class Button_Reset_Handler(QObject):
                 self.timelapseBtn = timelapse
                 self.PBar = PBar
                 self.Video_Stream = vidSteam
-                self.servoThread = servoThre
+                self.servoHorizontalThread = servoHThre
+                self.servoVerticalThread = servoVThre
                 self.xPos = xPosStausbar
                 self.yPos = yPosStausbar
                 self.statusBar = statusBar
@@ -108,9 +109,10 @@ class Button_Reset_Handler(QObject):
                 self.timelapseThread.Btn_Handler.connect(self.Button_Handler)
                 self.captureThread.Btn_Handler.connect(self.Button_Handler)
                 self.PBarThread.Btn_Handler.connect(self.Button_Handler)
-                self.servoThread.Btn_Handler.connect(self.Button_Handler)
-                self.servoThread.horizontal_Sig.connect(self.servo_Handler)
-                self.servoThread.vertical_Sig.connect(self.servo_Handler)
+                self.servoHorizontalThread.Btn_Handler.connect(self.Button_Handler)
+                self.servoVerticalThread.Btn_Handler.connect(self.Button_Handler)
+                self.servoHorizontalThread.horizontal_Sig.connect(self.servo_Handler)
+                self.servoVerticalThread.vertical_Sig.connect(self.servo_Handler)
                 
         # Resets button if button is pressed while recording video
         def Button_Handler(self, string):
@@ -149,7 +151,7 @@ class Button_Reset_Handler(QObject):
                         
         # To put servo value to status bar 
         def servo_Handler(self, string, value):
-
+                self.statusBar.setStyleSheet(GUI_Style.statusBarWhite)
                 if string == 'horizontalMotor':
                         if value == 'Min':
                                 self.statusBar.showMessage("Max RIGHT Movement Reached!", 2000) 
@@ -170,7 +172,7 @@ class Button_Reset_Handler(QObject):
         
 # Class to display error messages
 class Error_Handler(QObject):
-        def __init__(self, consoleLog, captureThre, recordThre, timelapseThre, videoStreamThre, dropDownThre, webStreamThre):
+        def __init__(self, consoleLog, captureThre, recordThre, timelapseThre, videoStreamThre, dropDownThre, webStreamThre, statusBar):
                 super(Error_Handler, self).__init__()
                 self.large_textbox = consoleLog
                 self.captureThread = captureThre
@@ -179,6 +181,7 @@ class Error_Handler(QObject):
                 self.videoStream = videoStreamThre
                 self.dropDown = dropDownThre
                 self.Web_Stream = webStreamThre
+                self.statusBar = statusBar
                 
                 # Connect signals to error function
                 self.recordThread.Error_Signal.connect(self.Show_Error)
@@ -191,7 +194,9 @@ class Error_Handler(QObject):
         # Function to write error message to console log
         def Show_Error(self, string):
                 self.errorMessage = string
-                self.WriteToConsole(self.errorMessage)
+                self.statusBar.setStyleSheet(GUI_Style.statusBarRed)
+                self.statusBar.showMessage(self.errorMessage, 5000) 
+                #~ self.WriteToConsole(self.errorMessage)
                 
         # Function to continue streams after any errors
         def resetAllStreams(self, string):
@@ -242,7 +247,10 @@ class Window(QMainWindow):
         self.PBarThread = QPBarThread(self.RPIRecordThread)
         self.sliderThread = QSliderThread(self.camera)
         self.dropdownThread = QDropDownThread(self.camera)
-        self.servoThread = QServoThread(PiServo, horizontal_pos, vertical_pos)
+        self.servoTrackpadThread = QServoTrackPadThread(PiServo, horizontal_pos, vertical_pos)
+        self.leftRightServoThread = QServoHorizontalThread(PiServo, horizontal_pos, vertical_pos)
+        self.upDownServoThread = QServoVerticalThread(PiServo, horizontal_pos, vertical_pos)
+        
         
         # Start run() function on threads
         self.RPICaptureThread.start()
@@ -254,7 +262,9 @@ class Window(QMainWindow):
         self.Web_Stream.start()
         self.sliderThread.start()
         self.dropdownThread.start()
-        self.servoThread.start()
+        self.servoTrackpadThread.start()
+        self.leftRightServoThread.start()
+        self.upDownServoThread.start()
     
 
         
@@ -275,7 +285,6 @@ class Window(QMainWindow):
         # Add Tabs and Tab Icon to tab widget
         self.MyTabs.addTab(self.MainTab, QIcon(Main_Tab_Path), '')
         self.MyTabs.addTab(self.ServoFreelookTab, 'Freelook') 
-        self.MyTabs.addTab(self.ServoSliderTab, 'Servo Slider') 
         self.MyTabs.addTab(self.ServoControllerTab, 'Servo Controller') 
         self.MyTabs.addTab(self.SettingsTab,QIcon(Settings_Tab_Path), '')   
         self.MyTabs.setIconSize(QSize(30, 40))
@@ -318,7 +327,7 @@ class Window(QMainWindow):
         
         
         # Create Layout to go on Main tab
-        horizontal_stream_layout = QHBoxLayout()  
+        #~ horizontal_stream_layout = QHBoxLayout()  
         vertical_button_layout = QVBoxLayout() 
         
         # Add buttons, console log and progress bar to layout
@@ -370,18 +379,6 @@ class Window(QMainWindow):
         # Add servo control layout to servo tab 
         self.ServoControllerTab.setLayout(vertical_servoCtrl_layout)
 
-        '''Servo Slider Tab'''
-        # Instantiate Servo GUI Objects 
-        self.upDownSlider()
-        self.leftRightSlider()
-        
-        # Create Layout to go on servo slider Tab
-        vertical_servoslider_layout = QVBoxLayout()
-        vertical_servoslider_layout.addWidget(self.leftRightSlider)
-        vertical_servoslider_layout.addWidget(self.upDownSlider)
-
-        # Add servo control layout to servo tab 
-        self.ServoSliderTab.setLayout(vertical_servoslider_layout)    
         
         ''' Settings Tab '''
         # Instantiate Settings GUI Objects        
@@ -556,7 +553,7 @@ class Window(QMainWindow):
         # Create Status Bar
     def StatusBar(self):
         self.statusBar = QStatusBar()
-        self.statusBar.setStyleSheet(GUI_Style.statusBar)
+        self.statusBar.setStyleSheet(GUI_Style.statusBarWhite)
         
         self.xHorizontal = QLabel()
         self.xHorizontal.setMinimumSize(50, 12)
@@ -622,8 +619,8 @@ class Window(QMainWindow):
     '''Handler classes'''
     # Instantiate button handler object class
     def allHandlers(self):
-        self.buttonHandler = Button_Reset_Handler(self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, self.PBarThread, self.snpsht_btn, self.rec_btn, self.Time_Lapse_btn, self.PBar, self.Video_Stream, self.servoThread, self.statusBar, self.xHorizontal, self.yVertical)
-        self.errorHandler = Error_Handler(self.LargeTextBox, self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, self.Video_Stream, self.dropdownThread, self.Web_Stream)
+        self.buttonHandler = Button_Reset_Handler(self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, self.PBarThread, self.snpsht_btn, self.rec_btn, self.Time_Lapse_btn, self.PBar, self.Video_Stream, self.leftRightServoThread, self.upDownServoThread , self.statusBar, self.xHorizontal, self.yVertical)
+        self.errorHandler = Error_Handler(self.LargeTextBox, self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, self.Video_Stream, self.dropdownThread, self.Web_Stream, self.statusBar)
 
     ''' Settings Tab GUI Objects'''
     # Brightness text/ logo
@@ -828,57 +825,30 @@ class Window(QMainWindow):
         '''Servo Controller tab GUI Objects'''   
     # To create button for left click events
     def leftButton(self):
-        self.left_btn = Left_Button(self, "Left", self.servoThread)
+        self.left_btn = Left_Button(self, "Left", self.leftRightServoThread)
         self.left_btn.setStyleSheet(GUI_Style.startButton)
         self.left_btn.pressed.connect(self.left_btn.On_Click)
-        self.left_btn.released.connect(self.left_btn.Un_Click)
         #~ self.left_btn.setIcon(QIcon(Camera_Idle_Path))
         #~ self.left_btn.setIconSize(QSize(65, 70))
         
     # To create button for right click events
     def rightButton(self):
-        self.right_btn = Right_Button(self, "Right", self.servoThread)
+        self.right_btn = Right_Button(self, "Right", self.leftRightServoThread)
         self.right_btn.setStyleSheet(GUI_Style.startButton)
         self.right_btn.pressed.connect(self.right_btn.On_Click)
-        self.right_btn.released.connect(self.right_btn.Un_Click)
         
     # To create button for up click events
     def upButton(self):
-        self.up_btn = Up_Button(self, "Up", self.servoThread)
+        self.up_btn = Up_Button(self, "Up", self.upDownServoThread)
         self.up_btn.setStyleSheet(GUI_Style.startButton)
         self.up_btn.pressed.connect(self.up_btn.On_Click)
-        self.up_btn.released.connect(self.up_btn.Un_Click)
         
     # To create button for down click events
     def downButton(self):
-        self.down_btn = Down_Button(self, "Down", self.servoThread)
+        self.down_btn = Down_Button(self, "Down", self.upDownServoThread)
         self.down_btn.setStyleSheet(GUI_Style.startButton)
         self.down_btn.pressed.connect(self.down_btn.On_Click)
-        self.down_btn.released.connect(self.down_btn.Un_Click)
 
-
-        
-        # To create slider to move camera up and down
-    def upDownSlider(self):
-        self.upDownSlider = upDown_Slider(self, self.servoThread)
-        self.upDownSlider.setOrientation(Qt.Vertical)
-        self.upDownSlider.setStyleSheet(GUI_Style.verticalSlider)  
-        self.upDownSlider.setFocusPolicy(Qt.NoFocus)
-        self.upDownSlider.setRange(0, 170)
-        self.upDownSlider.setValue(90)
-        #~ self.upDownMotor.angle = 90
-        self.upDownSlider.valueChanged[int].connect(self.upDownSlider.changeValue)
-          
-         # To create slider to move camera left and right       
-    def leftRightSlider(self):
-        self.leftRightSlider = leftRight_Slider(self, self.servoThread)   
-        self.leftRightSlider.setOrientation(Qt.Horizontal)
-        self.leftRightSlider.setStyleSheet(GUI_Style.saturationSlider)  
-        self.leftRightSlider.setFocusPolicy(Qt.NoFocus)
-        self.leftRightSlider.setRange(0, 180)
-        self.leftRightSlider.setValue(90)
-        #~ self.leftRightMotor.angle = 90
-        self.leftRightSlider.valueChanged[int].connect(self.leftRightSlider.changeValue) 
         
     # Stop all threads when GUI is closed
     def closeEvent(self, *args, **kwargs):
@@ -900,8 +870,13 @@ class Window(QMainWindow):
         self.sliderThread.wait(100)
         self.dropdownThread.Set_Exit_Program(True)
         self.dropdownThread.wait(100)
-        self.servoThread.Set_Exit_Program(True)
-        self.servoThread.wait(100)
+        self.servoTrackpadThread.Set_Exit_Program(True)
+        self.servoTrackpadThread.wait(100)
+        self.leftRightServoThread.Set_Exit_Program(True)
+        self.leftRightServoThread.wait(100)
+        self.upDownServoThread.Set_Exit_Program(True)
+        self.upDownServoThread.wait(100)
+
 
 #Main loop
 def run():
@@ -937,3 +912,4 @@ if __name__ == "__main__":
 # 1.3 - Add try/ exceptions to RPI Button threads for error handling. Timelapse now removes all images taken after video is created. Feb 27, 2019
 # 1.4 - Added resolution/ Framerate button. Mar 6, 2019
 # 1.5 - Added servo funcationality and tabs for control. Added keyboard keys for control of servos 'WASD' - Mar 11, 2019
+# 1.6 - Added status bar located bottom left - Mar 12, 2019

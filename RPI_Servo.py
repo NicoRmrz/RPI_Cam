@@ -31,26 +31,18 @@ class Initialize_Servo(object):
 
 '''Try Making 2 threads: vertical movement, horizontal movement for smoother movement'''
 
-class QServoThread(QThread):
+class QServoHorizontalThread(QThread):
 
-    upDown_Sig = pyqtSignal(int)
-    leftRight_Sig = pyqtSignal(int)
     horizontal_Sig = pyqtSignal(str, str)
-    vertical_Sig = pyqtSignal(str, str)
     Btn_Handler = pyqtSignal(str)
     
     def __init__(self, PiServo, horizontal_pos, vertical_pos):
         QThread.__init__(self)
         self.PiServo = PiServo
         self.exitProgram = False
-        self.upDownSlider = False
-        self.leftRightSlider = False
         self.left = False
         self.right = False
-        self.up = False
-        self.down = False
         self.horizontalPosition = horizontal_pos
-        self.verticalPosition = vertical_pos
         
         self.upDownMotor = self.PiServo.upDownMotor
         self.leftRightMotor = self.PiServo.leftRightMotor
@@ -71,7 +63,79 @@ class QServoThread(QThread):
             self.horizontalPosition = self.horizontalPosition - 2
         else:
             self.horizontalPosition = self.horizontalPosition
+               
+    # Sets up the program to exit when the main window is shutting down
+    def Set_Exit_Program(self, exiter):
+        self.exitProgram = exiter
+
+    # This function is started by .start() and runs the main portion of the code
+    def run(self):
+
+        while(1):
+                      
+            #Set for left key "A" to move camera left
+            if self.left != False:
+                if (self.horizontalPosition >=0 and self.horizontalPosition <= 180):
+                    self.leftRightMotor.angle = self.horizontalPosition
+                    self.horizontalDone("horizontalMotor", str(self.horizontalPosition))         #Emit new position of servo
+                    
+                elif (self.horizontalPosition < 0):
+                    self.horizontalDone("horizontalMotor", "Min")
+                    
+                elif (self.horizontalPosition > 180):
+                    self.horizontalDone("horizontalMotor", "Max")
+                    
+                self.ButtonHandler("Left")
+                self.left = False
+                     
+            #Set for right key "D" to move camera right
+            if self.right != False:
+                if (self.horizontalPosition >=0 and self.horizontalPosition <= 180):
+                    self.leftRightMotor.angle = self.horizontalPosition
+                    self.horizontalDone("horizontalMotor", str(self.horizontalPosition))         #Emit new position of servo
+                    
+                elif (self.horizontalPosition < 0):
+                    self.horizontalDone("horizontalMotor", "Min")
+                    
+                elif (self.horizontalPosition > 180):
+                    self.horizontalDone("horizontalMotor", "Max")
+                    
+                self.ButtonHandler("Right")
+                self.right = False
         
+                
+            if(self.exitProgram == True):
+                self.hat.deinit() # To stop using pca9685
+                self.exitProgram = False
+                break
+
+            sleep(0.01)
+
+    def horizontalDone(self, string, value):
+        self.horizontal_Sig.emit(string, value)
+        
+    def ButtonHandler(self, string):
+        self.Btn_Handler.emit(string)
+            
+
+class QServoVerticalThread(QThread):
+
+    vertical_Sig = pyqtSignal(str, str)
+    Btn_Handler = pyqtSignal(str)
+    
+    def __init__(self, PiServo, horizontal_pos, vertical_pos):
+        QThread.__init__(self)
+        self.PiServo = PiServo
+        self.exitProgram = False
+        self.up = False
+        self.down = False
+        self.horizontalPosition = horizontal_pos
+        self.verticalPosition = vertical_pos
+        
+        self.upDownMotor = self.PiServo.upDownMotor
+        self.leftRightMotor = self.PiServo.leftRightMotor
+        self.hat = self.PiServo.hat
+
     # Set to move camera up
     def set_upButton(self, string):
         self.up = string
@@ -87,18 +151,7 @@ class QServoThread(QThread):
             self.verticalPosition = self.verticalPosition + 2
         else:
             self.verticalPosition = self.verticalPosition
-        
-        
-    # Set to update value of Up Down Servo slider
-    def set_upDownSlider(self, string, newNum):
-        self.upDownSlider = string
-        self.upDownValue = 180 - newNum
-  
-    # Set to update value of Left Right Servo slider
-    def set_leftRightSlider(self, string, newNum):
-        self.leftRightSlider = string
-        self.leftRightValue = 180 - newNum
-        
+
     # Sets up the program to exit when the main window is shutting down
     def Set_Exit_Program(self, exiter):
         self.exitProgram = exiter
@@ -122,23 +175,7 @@ class QServoThread(QThread):
                     
                 self.ButtonHandler("Up")
                 self.up = False
-            
-            #Set for left key "A" to move camera left
-            if self.left != False:
-                if (self.horizontalPosition >=0 and self.horizontalPosition <= 180):
-                    self.leftRightMotor.angle = self.horizontalPosition
-                    self.horizontalDone("horizontalMotor", str(self.horizontalPosition))         #Emit new position of servo
-                    
-                elif (self.horizontalPosition < 0):
-                    self.horizontalDone("horizontalMotor", "Min")
-                    
-                elif (self.horizontalPosition > 180):
-                    self.horizontalDone("horizontalMotor", "Max")
-                    
-                self.ButtonHandler("Left")
-                self.left = False
-            
-                        
+       
             #Set for left key "S" to move camera down
             if self.down != False:
                 if (self.verticalPosition >10 and self.verticalPosition <= 180):
@@ -153,21 +190,65 @@ class QServoThread(QThread):
                     
                 self.ButtonHandler("Down")
                 self.down = False
+      
+            if(self.exitProgram == True):
+                self.hat.deinit() # To stop using pca9685
+                self.exitProgram = False
+                break
+
+            sleep(0.01)
+
+        
+    def verticalDone(self, string, value):
+        self.vertical_Sig.emit(string, value)
+        
+    def ButtonHandler(self, string):
+        self.Btn_Handler.emit(string)
             
-            #Set for right key "D" to move camera right
-            if self.right != False:
-                if (self.horizontalPosition >=0 and self.horizontalPosition <= 180):
-                    self.leftRightMotor.angle = self.horizontalPosition
-                    self.horizontalDone("horizontalMotor", str(self.horizontalPosition))         #Emit new position of servo
-                    
-                elif (self.horizontalPosition < 0):
-                    self.horizontalDone("horizontalMotor", "Min")
-                    
-                elif (self.horizontalPosition > 180):
-                    self.horizontalDone("horizontalMotor", "Max")
-                    
-                self.ButtonHandler("Right")
-                self.right = False
+    
+
+class QServoTrackPadThread(QThread):
+
+    upDown_Sig = pyqtSignal(int)
+    leftRight_Sig = pyqtSignal(int)
+    horizontal_Sig = pyqtSignal(str, str)
+    vertical_Sig = pyqtSignal(str, str)
+    Btn_Handler = pyqtSignal(str)
+    
+    def __init__(self, PiServo, horizontal_pos, vertical_pos):
+        QThread.__init__(self)
+        self.PiServo = PiServo
+        self.exitProgram = False
+        self.upDownSlider = False
+        self.leftRightSlider = False
+        self.horizontalPosition = horizontal_pos
+        self.verticalPosition = vertical_pos
+        
+        self.upDownMotor = self.PiServo.upDownMotor
+        self.leftRightMotor = self.PiServo.leftRightMotor
+        self.hat = self.PiServo.hat
+
+        
+        
+    # Set to update value of Up Down Servo slider
+    def set_upDownSlider(self, string, newNum):
+        self.upDownSlider = string
+        self.upDownValue = 180 - newNum
+  
+    # Set to update value of Left Right Servo slider
+    def set_leftRightSlider(self, string, newNum):
+        self.leftRightSlider = string
+        self.leftRightValue = 180 - newNum
+        
+    # Sets up the program to exit when the main window is shutting down
+    def Set_Exit_Program(self, exiter):
+        self.exitProgram = exiter
+
+    # This function is started by .start() and runs the main portion of the code
+    def run(self):
+
+        while(1):
+           
             
             # set for upDownSlider servo to move
             if self.upDownSlider != False:        
@@ -188,11 +269,6 @@ class QServoThread(QThread):
 
             sleep(0.5)
 
-    def upDownDONE(self, value):
-        self.upDown_Sig.emit(value)
-            
-    def leftRightDONE(self, value):
-        self.leftRight_Sig.emit(value)
 
     def horizontalDone(self, string, value):
         self.horizontal_Sig.emit(string, value)

@@ -25,26 +25,11 @@ class Left_Button(QPushButton):
         self.setText(text)
         self.setParent(window)
         self.servoThread = thread
-        
-        #Connecting completions signals to functions
-        #~ self.servoThread.left_Sig.connect(self.ButtonDone)    
-        
+           
     # Function call for the click event
     def On_Click(self):
         self.servoThread.set_leftButton(True)
-        # Button turns yellow for activated
-        #~ self.setIcon(QIcon(Camera_Capture_Path))
-
-    # Function call for the Done event
-    #~ def ButtonDone(self, value):
-        #~ print(value)
-        
-        # Function call for the Un_click event
-    def Un_Click(self):
-        #~ self.servoThread.Set_Video_Stream_Ready(False)
-        pass
-       
-        
+               
 class Right_Button(QPushButton):
     def __init__(self, window, text, thread):
         super(Right_Button, self).__init__()
@@ -52,23 +37,9 @@ class Right_Button(QPushButton):
         self.setParent(window)
         self.servoThread = thread
         
-       #Connecting completions signals to functions
-        #~ self.servoThread.right_Sig.connect(self.ButtonDone)    
-        
     # Function call for the click event
     def On_Click(self):
         self.servoThread.set_rightButton(True)
-        # Button turns yellow for activated
-        #~ self.setIcon(QIcon(Camera_Capture_Path))
-
-    # Function call for the Done event
-    #~ def ButtonDone(self, value):
-        #~ print(value)
-        
-        # Function call for the Un_click event
-    def Un_Click(self):
-        #~ self.servoThread.Set_Video_Stream_Ready(False)
-        pass
         
 class Up_Button(QPushButton):
     def __init__(self, window, text, thread):
@@ -76,22 +47,10 @@ class Up_Button(QPushButton):
         self.setText(text)
         self.setParent(window)
         self.servoThread = thread
-        
-        #Connecting completions signals to functions
-        #~ self.servoThread.Snap_Captured_signal.connect(self.Snapshot_Captured)    
-        
+
     # Function call for the click event
     def On_Click(self):
         self.servoThread.set_upButton(True)
-        #~ print("up button")
-        
-        # Button turns yellow for activated
-        #~ self.setIcon(QIcon(Camera_Capture_Path))
-
-    # Function call for the Un_click event
-    def Un_Click(self):
-        #~ self.servoThread.Set_Video_Stream_Ready(False)
-        pass
         
 class Down_Button(QPushButton):
     def __init__(self, window, text, thread):
@@ -100,22 +59,9 @@ class Down_Button(QPushButton):
         self.setParent(window)
         self.servoThread = thread
         
-        #Connecting completions signals to functions
-        #~ self.servoThread.Snap_Captured_signal.connect(self.Snapshot_Captured)    
-        
     # Function call for the click event
     def On_Click(self):
         self.servoThread.set_downButton(True)
-        #~ print("down button")
-        
-        # Button turns yellow for activated
-        #~ self.setIcon(QleftIcon(Camera_Capture_Path))
-
-    # Function call for the Un_click event
-    def Un_Click(self):
-        #~ self.servoThread.Set_Video_Stream_Ready(False)
-        pass
-        
                 
 class upDown_Slider(QSlider):         #Up Down servo Slider
 
