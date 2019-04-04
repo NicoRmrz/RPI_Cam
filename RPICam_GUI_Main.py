@@ -10,7 +10,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
 #Imports from made files
 from Initialize_PiCam import Setup_PiCam
 from RPICam_GUI_Buttons import Snapshot_Button, Record_Button, TimeLapse_Button, Stop_Button
-from RPICam_GUI_Servo import MouseTracker, upDown_Slider, leftRight_Slider, Left_Button, Right_Button, Up_Button, Down_Button
+from RPICam_GUI_Servo import MouseTracker, Left_Button, Right_Button, Up_Button, Down_Button
 from RPICam_GUI_Settings import Brightness_Slider, Contrast_Slider, Sharpness_Slider, Saturation_Slider, Annotation_Slider, Image_Effect_DropDown, Exposure_Mode_DropDown, Resolution_Framerate_DropDown
 
 from RPI_Capture_Thread import QRPICaptureThread
@@ -44,6 +44,12 @@ TimeLapse_Idle_Path = Main_path + 'Icon_Image/timelapse_idle1.png'
 TimeLapse_InUse_Path = Main_path + 'Icon_Image/timelapse_inuse.png'
 Main_Tab_Path = Main_path + 'Icon_Image/mainTab.png'
 Settings_Tab_Path = Main_path + 'Icon_Image/settingsTab.png'
+ServoController_Tab_Path = Main_path + 'Icon_Image/controllerTab.png'
+Left_Button_Path = Main_path + 'Icon_Image/leftButton.png'
+Right_Button_Path = Main_path + 'Icon_Image/rightButton.png'
+Up_Button_Path = Main_path + 'Icon_Image/upButton.png'
+Down_Button_Path = Main_path + 'Icon_Image/downButton.png'
+Freelook_Path = Main_path + 'Icon_Image/freelook1.png'
 
 # Instantiate style sheets for GUI Objects
 GUI_Style = GUI_Stylesheets()
@@ -285,8 +291,8 @@ class Window(QMainWindow):
         
         # Add Tabs and Tab Icon to tab widget
         self.MyTabs.addTab(self.MainTab, QIcon(Main_Tab_Path), '')
-        self.MyTabs.addTab(self.ServoFreelookTab, 'Freelook') 
-        self.MyTabs.addTab(self.ServoControllerTab, 'Servo Controller') 
+        self.MyTabs.addTab(self.ServoFreelookTab, QIcon(Freelook_Path), '') 
+        self.MyTabs.addTab(self.ServoControllerTab, QIcon(ServoController_Tab_Path), '') 
         self.MyTabs.addTab(self.SettingsTab,QIcon(Settings_Tab_Path), '')   
         self.MyTabs.setIconSize(QSize(30, 40))
         
@@ -827,27 +833,35 @@ class Window(QMainWindow):
         '''Servo Controller tab GUI Objects'''   
     # To create button for left click events
     def leftButton(self):
-        self.left_btn = Left_Button(self, "Left", self.leftRightServoThread)
+        self.left_btn = Left_Button(self, "", self.leftRightServoThread)
         self.left_btn.setStyleSheet(GUI_Style.startButton)
         self.left_btn.clicked.connect(self.left_btn.On_Click)
+        self.left_btn.setIcon(QIcon(Left_Button_Path))
+        self.left_btn.setIconSize(QSize(65, 70))
         
     # To create button for right click events
     def rightButton(self):
-        self.right_btn = Right_Button(self, "Right", self.leftRightServoThread)
+        self.right_btn = Right_Button(self, "", self.leftRightServoThread)
         self.right_btn.setStyleSheet(GUI_Style.startButton)
         self.right_btn.clicked.connect(self.right_btn.On_Click)
+        self.right_btn.setIcon(QIcon(Right_Button_Path))
+        self.right_btn.setIconSize(QSize(65, 70))
         
     # To create button for up click events
     def upButton(self):
-        self.up_btn = Up_Button(self, "Up", self.upDownServoThread)
+        self.up_btn = Up_Button(self, "", self.upDownServoThread)
         self.up_btn.setStyleSheet(GUI_Style.startButton)
         self.up_btn.clicked.connect(self.up_btn.On_Click)
+        self.up_btn.setIcon(QIcon(Up_Button_Path))
+        self.up_btn.setIconSize(QSize(65, 70))
         
     # To create button for down click events
     def downButton(self):
-        self.down_btn = Down_Button(self, "Down", self.upDownServoThread)
+        self.down_btn = Down_Button(self, "", self.upDownServoThread)
         self.down_btn.setStyleSheet(GUI_Style.startButton)
         self.down_btn.clicked.connect(self.down_btn.On_Click)
+        self.down_btn.setIcon(QIcon(Down_Button_Path))
+        self.down_btn.setIconSize(QSize(65, 70))
 
         
     # Stop all threads when GUI is closed
