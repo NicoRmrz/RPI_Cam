@@ -25,7 +25,7 @@ from GUI_Stylesheets import GUI_Stylesheets
 from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
-appVersion = "1.7"      # Update version
+appVersion = "1.8"      # Update version
 
 #Initial postion of servos
 horizontal_pos = 90
@@ -177,6 +177,7 @@ class Button_Reset_Handler(QObject):
                         else:
                                 newVal = 180 - int(value)
                                 self.yPos.setText("| Y: " + str(newVal))
+
         
 # Class to display error messages
 class Error_Handler(QObject):
@@ -330,8 +331,6 @@ class Window(QMainWindow):
         self.Record_Btn_GUI()
         self.TimeLapse_Btn_GUI()
         self.Stop_Btn_GUI()
-        
-        
         
         # Create Layout to go on Main tab
         #~ horizontal_stream_layout = QHBoxLayout()  
@@ -500,7 +499,7 @@ class Window(QMainWindow):
         self.Video_Stream.Set_Video_Stream_Ready(True)
         
         # start web streaming on start up      
-        self.Web_Stream.StartStreaming(True)
+        #self.Web_Stream.StartStreaming(True)
         
         # Display GUI Objects
         self.show()
@@ -626,10 +625,24 @@ class Window(QMainWindow):
     '''Handler classes'''
     # Instantiate button handler object class
     def allHandlers(self):
-        self.buttonHandler = Button_Reset_Handler(self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, self.PBarThread, self.snpsht_btn, self.rec_btn, self.Time_Lapse_btn, self.PBar, self.Video_Stream, self.leftRightServoThread, self.upDownServoThread , self.statusBar, self.xHorizontal, self.yVertical)
-        self.errorHandler = Error_Handler(self.LargeTextBox, self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, self.Video_Stream, self.dropdownThread, self.Web_Stream, self.statusBar)
+        self.buttonHandler = Button_Reset_Handler(self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, self.PBarThread, 
+                                                        self.snpsht_btn, self.rec_btn, self.Time_Lapse_btn,self.PBar, self.Video_Stream, 
+                                                        self.leftRightServoThread, self.upDownServoThread , self.statusBar, self.xHorizontal, 
+                                                        self.yVertical)
+        self.errorHandler = Error_Handler(self.LargeTextBox, self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, 
+                                                        self.Video_Stream, self.dropdownThread, self.Web_Stream, self.statusBar)
 
     ''' Settings Tab GUI Objects'''
+    # Start web stream button
+    def webStream_Btn_GUI(self):
+        self.webStream_Btn = WebStream_Button(self, "Web Stream", self.LargeTextBox, self.Web_Stream)
+        #~ self.webStream_Btn.setStyleSheet(GUI_Style.stopButton)
+        self.webStream_Btn.pressed.connect(self.webStream_Btn.On_Click)
+        self.webStream_Btn.released.connect(self.webStream_Btn.Un_Click) 
+        #~ self.webStream_Btn.setIcon(QIcon(Stop_Idle_Path))
+        #~ self.webStream_Btn.setIconSize(QSize(60, 60))
+        self.webStream_Btn.setSize(60, 60)
+    
     # Brightness text/ logo
     def brightnessLabel(self):
         self.brightnessLbl = QLabel(self)
@@ -928,3 +941,4 @@ if __name__ == "__main__":
 # 1.5 - Added servo funcationality and tabs for control. Added keyboard keys for control of servos 'WASD' - Mar 11, 2019
 # 1.6 - Added status bar located bottom left - Mar 12, 2019
 # 1.7 - Added thread for smoother motor movements. Removed Sliders tab - Mar 23, 2019
+# 1.8 - Moved start web stream to a button. Added night mode button.

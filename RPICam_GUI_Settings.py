@@ -4,6 +4,45 @@ from PyQt5.QtGui import QPixmap, QIcon, QFont, QTextCursor, QPalette, QImage, QB
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
 
 #GUI Classes
+# Pushbutton class to enable webStream
+class WebStream_Button(QPushButton):         #WebStream button
+    def __init__(self, window, text, consoleLog, webThread):
+        super(WebStream_Button, self).__init__()
+        self.setText(text)
+        self.setParent(window)
+        
+        # Connecting Signals
+        self.webStream.Web_Stream_signal.connect(self.Web_Stream_ON)
+
+        
+    # Function call for the click event
+    def On_Click(self):
+        pass
+        
+    # Button turns red for activated
+
+    # Function call for the Un_click event
+    def Un_Click(self):
+        self.Reset_GUI()
+        
+    
+    # Funtion call for rweb stream on acknoledgment
+    def Web_Stream_ON(self, string):
+            self.WriteToConsole(string)             # write web stream enabled 
+        
+    #Resets the necessary objects 
+    def Reset_GUI(self):
+        pass
+        
+                                
+    # Function call to write to Console Log
+    def WriteToConsole(self, new_input):
+            self.old_window = self.large_textbox.toPlainText()
+            self.new_window = self.old_window + '\n' + new_input
+            self.large_textbox.setText(self.new_window)
+            self.large_textbox.moveCursor(QTextCursor.End)
+    
+        
 #This is the class for sliders from the Pyqt 5 framework
 class Brightness_Slider(QSlider):         #Brightness Slider
 

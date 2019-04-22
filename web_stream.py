@@ -131,8 +131,8 @@ class WebStream_Thread(QThread):
     def __init__(self, RPICamera):
         QThread.__init__(self)
         self.camera = RPICamera
-        global camera 
-        camera = self.camera
+        #~ global camera 
+        #~ camera = self.camera
         self.exitProgram = False
         self.Server_Ready = False
         self.Stop_Ready = False
@@ -179,6 +179,7 @@ class WebStream_Thread(QThread):
                 address = ('', Port_Number)
                 server = StreamingServer(address, StreamingHandler)
                 print('Starting server, use <Ctrl-C> to stop')
+                Steam_Out('Starting server, use <Ctrl-C> to stop')
                 server.serve_forever()
                     
             if(self.exitProgram == True):

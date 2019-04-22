@@ -42,8 +42,16 @@ class GUI_Stylesheets(QObject):
 						"QTabBar::tab:only-one {margin: 0;}"
 						)
 		
-		self.statusBar = ("QStatusBar { background: #95c8d8; "
+		self.statusBarWhite = ("QStatusBar { background: #95c8d8; "
 										"color:white;} "
+
+							"QStatusBar::item {border: 1px solid #95c8d8; "
+								"border-radius: 3px; }"
+								
+							)
+		
+		self.statusBarRed = ("QStatusBar { background: #95c8d8; "
+										"color:red;} "
 
 							"QStatusBar::item {border: 1px solid #95c8d8; "
 								"border-radius: 3px; }"
