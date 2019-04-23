@@ -6,6 +6,10 @@ import PyQt5
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, QLabel, QCheckBox, QTextEdit, QProgressBar, QSizePolicy, QWidget, QTabWidget, QHBoxLayout, QVBoxLayout, QSlider
 from PyQt5.QtGui import QPixmap, QIcon, QFont, QTextCursor, QPalette, QImage, QBrush
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
+from GUI_Stylesheets import GUI_Stylesheets
+
+# Instantiate style sheets for GUI Objects
+GUI_Style = GUI_Stylesheets()
 
 RECORD_TIME = 100        # 100 seconds
 
@@ -315,3 +319,57 @@ class Stop_Button(QPushButton):         #Stop Button
 		#Turn button color back to normal
 		self.setIcon(QIcon(Stop_Idle_Path))
 		self.RecordBtn.setIcon(QIcon(Video_Idle_Path))
+
+class Logo_Button(QPushButton):         # Secret Logobutton
+    old_window = None
+    new_window = None
+    NIGHT_MODE = False
+
+    # Initializes the necessary objects into the button class for control
+    def __init__(self, window, text, input_largetextbox, statusBar, xPOS, yPOS, res):
+        super(Logo_Button, self).__init__()
+        self.setText(text)
+        self.setParent(window)
+        self.mainWindow = window
+        self.large_textbox = input_largetextbox
+        self.statusBar = statusBar
+        self.xHorizontal = xPOS
+        self.yVertical = yPOS
+        self.res = res
+
+    # Function call for the click event
+    def On_Click(self):
+        pass
+
+    # Function call for the Un_click event
+    def Un_Click(self):
+        if self.NIGHT_MODE != True:
+            self.Night_Mode()
+            self.NIGHT_MODE = True
+
+        elif self.NIGHT_MODE != False:
+            self.Regular_Mode()
+            self.NIGHT_MODE = False
+            
+        # Night Mode
+    def Night_Mode(self):
+        self.mainWindow.setStyleSheet(GUI_Style.NM_mainWindow)
+        self.statusBar.setStyleSheet(GUI_Style.NM_statusBarWhite)
+        self.xHorizontal.setStyleSheet(GUI_Style.NM_statusBar_XY)
+        self.yVertical.setStyleSheet(GUI_Style.NM_statusBar_XY)
+        self.res.setStyleSheet(GUI_Style.NM_statusBar_widgets)
+
+    # Regular Mode
+    def Regular_Mode(self):
+        self.mainWindow.setStyleSheet(GUI_Style.mainWindow)
+        self.statusBar.setStyleSheet(GUI_Style.statusBarWhite)
+        self.xHorizontal.setStyleSheet(GUI_Style.statusBar_XY)
+        self.yVertical.setStyleSheet(GUI_Style.statusBar_XY)
+        self.res.setStyleSheet(GUI_Style.statusBar_widgets)
+        
+     # Function call to write to Console Log
+    def WriteToConsole(self, new_input):
+        self.old_window = self.large_textbox.toPlainText()
+        self.new_window = self.old_window + '\n' + new_input
+        self.large_textbox.setText(self.new_window)
+        self.large_textbox.moveCursor(QTextCursor.End)

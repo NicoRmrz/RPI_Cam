@@ -9,9 +9,9 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
 
 #Imports from made files
 from Initialize_PiCam import Setup_PiCam
-from RPICam_GUI_Buttons import Snapshot_Button, Record_Button, TimeLapse_Button, Stop_Button
+from RPICam_GUI_Buttons import Snapshot_Button, Record_Button, TimeLapse_Button, Stop_Button, Logo_Button
 from RPICam_GUI_Servo import MouseTracker, Left_Button, Right_Button, Up_Button, Down_Button
-from RPICam_GUI_Settings import Brightness_Slider, Contrast_Slider, Sharpness_Slider, Saturation_Slider, Annotation_Slider, Image_Effect_DropDown, Exposure_Mode_DropDown, Resolution_Framerate_DropDown
+from RPICam_GUI_Settings import WebStream_Button, Brightness_Slider, Contrast_Slider, Sharpness_Slider, Saturation_Slider, Annotation_Slider, Image_Effect_DropDown, Exposure_Mode_DropDown, Resolution_Framerate_DropDown
 
 from RPI_Capture_Thread import QRPICaptureThread
 from RPI_Record_Thread import QRPIRecordVideoThread, QPBarThread
@@ -34,6 +34,7 @@ vertical_pos = 90
 # Icon Image locations
 Main_path = os.getcwd() + "/"     
 Icon_Path = Main_path + 'Icon_Image/pup.jpg'
+Logo_Path = Main_path + 'Icon_Image/logo_icon_white.png'
 Camera_Idle_Path = Main_path + 'Icon_Image/cam_idle.png'
 Camera_Capture_Path = Main_path + 'Icon_Image/cam_capture.png'
 Video_Idle_Path = Main_path + 'Icon_Image/video_idle.png'
@@ -88,8 +89,8 @@ class Stream_Video(QLabel):
              
     def TimeLapsetoGUI(self, input_tlapse):
         self.Tlapse_img = input_tlapse
-        pixmap = QPixmap(self.Tlapse_img)
-        self.setPixmap(pixmap)       
+        #~ pixmap = QPixmap(self.Tlapse_img)
+        #~ self.setPixmap(pixmap)       
         
 # Class to reset button icons
 class Button_Reset_Handler(QObject):
@@ -157,7 +158,6 @@ class Button_Reset_Handler(QObject):
                         
         # To put servo value to status bar 
         def servo_Handler(self, string, value):
-                self.statusBar.setStyleSheet(GUI_Style.statusBarWhite)
                 if string == 'horizontalMotor':
                         if value == 'Min':
                                 self.statusBar.showMessage("Max RIGHT Movement Reached!", 2000) 
@@ -259,7 +259,6 @@ class Window(QMainWindow):
         self.leftRightServoThread = QServoHorizontalThread(PiServo, horizontal_pos, vertical_pos)
         self.upDownServoThread = QServoVerticalThread(PiServo, horizontal_pos, vertical_pos)
         
-        
         # Start run() function on threads
         self.RPICaptureThread.start()
         self.RPIRecordThread.start()
@@ -274,8 +273,6 @@ class Window(QMainWindow):
         self.leftRightServoThread.start()
         self.upDownServoThread.start()
     
-
-        
         # This builds the main widget for the GUI window to hold
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
@@ -304,19 +301,26 @@ class Window(QMainWindow):
         
         # Create Main window layout to hold tabs and GUI objects
         Main_Window_HLayout = QHBoxLayout()  
+        Main_Title_Layout   = QHBoxLayout()  
         Main_Window_VLayout = QVBoxLayout()  
         
         # Instantiate Window objects
         self.VideoStream()
-        self.Progress_Bar()
+        #~ self.Progress_Bar()
         self.MessageWindowTextBox()
+        self.MainLogoButton()
         self.MainTitle()
         
+        # Add title and logo to layout
+        Main_Title_Layout.addWidget(self.Logo_btn)
+        Main_Title_Layout.addWidget(self.UpperText, 0, Qt.AlignCenter)
+        Main_Title_Layout.setSpacing(10)
+        
         # Add GUI object to left side of GUI window
-        Main_Window_VLayout.addWidget(self.UpperText, 0, Qt.AlignCenter)
+        Main_Window_VLayout.addLayout(Main_Title_Layout)
         Main_Window_VLayout.addWidget(self.MyTabs) 
         Main_Window_VLayout.addWidget(self.LargeTextBox)
-        Main_Window_VLayout.addWidget(self.PBar)
+        #~ Main_Window_VLayout.addWidget(self.PBar)
         Main_Window_VLayout.setSpacing(20)
         
         # Add tabs and video stream to main window layout
@@ -328,6 +332,7 @@ class Window(QMainWindow):
         ''' Home Tab '''
         # Instantiate Home GUI Objects
         self.Snapshot_Btn_GUI()
+        self.Progress_Bar()
         self.Record_Btn_GUI()
         self.TimeLapse_Btn_GUI()
         self.Stop_Btn_GUI()
@@ -341,8 +346,9 @@ class Window(QMainWindow):
         vertical_button_layout.addWidget(self.rec_btn, 0, Qt.AlignCenter) 
         vertical_button_layout.addWidget(self.Time_Lapse_btn, 0, Qt.AlignCenter) 
         vertical_button_layout.addWidget(self.stp_rec_btn, 0, Qt.AlignCenter)
+        vertical_button_layout.addWidget(self.PBar)
         vertical_button_layout.setSpacing(30)
-        vertical_button_layout.setContentsMargins(0, 10, 0, 0)
+        vertical_button_layout.setContentsMargins(0, 20, 0, 0)
 
         # Add home vertical layout to main tab layout
         self.MainTab.setLayout(vertical_button_layout)
@@ -387,7 +393,8 @@ class Window(QMainWindow):
 
         
         ''' Settings Tab '''
-        # Instantiate Settings GUI Objects        
+        # Instantiate Settings GUI Objects    
+        self.webStream_Btn_GUI()    
         self.brightnessLabel()
         self.brightnessNumber()
         self.brightnessSlider()
@@ -479,10 +486,11 @@ class Window(QMainWindow):
         comboBox_HLayout.setContentsMargins(0, 20, 0, 0)
         
         # add horizontal layouts to vertical layout
+        vertical_settings_layout.addWidget(self.webStream_Btn)
         vertical_settings_layout.addLayout(horizontal_settings_layout)
         vertical_settings_layout.addLayout(comboBox_HLayout)
         vertical_settings_layout.setSpacing(10)
-        vertical_settings_layout.setContentsMargins(0, 0, 0, 0)
+        vertical_settings_layout.setContentsMargins(0, 10, 0, 0)
         
         # Add vertical layout to settings tab layout
         self.SettingsTab.setLayout(vertical_settings_layout)    
@@ -497,9 +505,6 @@ class Window(QMainWindow):
         
         # start streaming video on start up
         self.Video_Stream.Set_Video_Stream_Ready(True)
-        
-        # start web streaming on start up      
-        #self.Web_Stream.StartStreaming(True)
         
         # Display GUI Objects
         self.show()
@@ -527,6 +532,15 @@ class Window(QMainWindow):
         self.UpperText = QLabel(self)
         self.UpperText.setText("RPI Cam Controller")
         self.UpperText.setStyleSheet(GUI_Style.mainTitle)
+        
+    # Create Main Logo Button
+    def MainLogoButton(self):
+        self.Logo_btn = Logo_Button(self, "", self.LargeTextBox, self.statusBar, self.xHorizontal, self.yVertical, self.res)
+        self.Logo_btn.setStyleSheet(GUI_Style.startButton)
+        self.Logo_btn.pressed.connect(self.Logo_btn.On_Click)
+        self.Logo_btn.released.connect(self.Logo_btn.Un_Click)
+        self.Logo_btn.setIcon(QIcon(Logo_Path))
+        self.Logo_btn.setIconSize(QSize(65, 70))
 
     # Create Window to stream live feed
     def VideoStream(self):
@@ -636,12 +650,12 @@ class Window(QMainWindow):
     # Start web stream button
     def webStream_Btn_GUI(self):
         self.webStream_Btn = WebStream_Button(self, "Web Stream", self.LargeTextBox, self.Web_Stream)
-        #~ self.webStream_Btn.setStyleSheet(GUI_Style.stopButton)
+        self.webStream_Btn.setStyleSheet(GUI_Style.webButton)
         self.webStream_Btn.pressed.connect(self.webStream_Btn.On_Click)
         self.webStream_Btn.released.connect(self.webStream_Btn.Un_Click) 
         #~ self.webStream_Btn.setIcon(QIcon(Stop_Idle_Path))
         #~ self.webStream_Btn.setIconSize(QSize(60, 60))
-        self.webStream_Btn.setSize(60, 60)
+        #~ self.webStream_Btn.setSize(60, 60)
     
     # Brightness text/ logo
     def brightnessLabel(self):
@@ -742,7 +756,7 @@ class Window(QMainWindow):
     def annotationNumber(self):
         self.annotationNum = QLabel(self)
         self.annotationNum.setMaximumWidth(40)
-        self.annotationNum.setText("50")
+        self.annotationNum.setText("30")
         self.annotationNum.setStyleSheet(GUI_Style.sliderNumber) 
         
     # Annotation Slider
@@ -752,8 +766,8 @@ class Window(QMainWindow):
         self.annotationSldr.setStyleSheet(GUI_Style.annotationSlider)
         self.annotationSldr.setFocusPolicy(Qt.NoFocus)
         self.annotationSldr.setRange(6, 160)
-        self.annotationSldr.setValue(45)
-        self.camera.annotate_text_size = 45
+        self.annotationSldr.setValue(30)
+        self.camera.annotate_text_size = 30
         self.annotationSldr.valueChanged[int].connect(self.annotationSldr.changeValue)
         
     # Image Effect text/ logo
@@ -829,9 +843,10 @@ class Window(QMainWindow):
         self.resFrmrtDrpDwn.addItem("1640x922 @ 30 fps")
         self.resFrmrtDrpDwn.addItem("1280x720 @ 40 fps")
         self.resFrmrtDrpDwn.addItem("640x480 @ 60 fps")
+        self.resFrmrtDrpDwn.setCurrentIndex(2)
 
         self.resFrmrtDrpDwn.setStyleSheet(GUI_Style.resolutionFramerate)   
-        self.camera.resolution = (1640, 1232)
+        self.camera.resolution = (1280, 720)
         self.camera.framerate = 60 
         self.resFrmrtDrpDwn.activated[str].connect(self.resFrmrtDrpDwn.resolutionFramerate_Selection)
    
@@ -916,7 +931,6 @@ def run():
 
 #Main code
 if __name__ == "__main__":
-
     run()
     
     
@@ -941,4 +955,4 @@ if __name__ == "__main__":
 # 1.5 - Added servo funcationality and tabs for control. Added keyboard keys for control of servos 'WASD' - Mar 11, 2019
 # 1.6 - Added status bar located bottom left - Mar 12, 2019
 # 1.7 - Added thread for smoother motor movements. Removed Sliders tab - Mar 23, 2019
-# 1.8 - Moved start web stream to a button. Added night mode button.
+# 1.8 - Moved starting web stream to a button. Added night secret mode button. - Apr 23, 2019

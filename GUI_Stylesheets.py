@@ -8,6 +8,8 @@ class GUI_Stylesheets(QObject):
 		
 		self.mainWindow = 	("background-color: #95c8d8") 
 		
+		self.NM_mainWindow = ("background-color: rgba(49, 51, 53, 240);")
+		
 		self.mainTitle =	("font: bold 35px Verdana; "
 							"color: white; "
 							"background-color: rgba(18,151,147,0)"
@@ -50,13 +52,15 @@ class GUI_Stylesheets(QObject):
 								
 							)
 		
-		self.statusBarRed = ("QStatusBar { background: #95c8d8; "
-										"color:red;} "
+		self.NM_statusBarWhite = ("QStatusBar { background: #313335;"
+										"color:white;} "
 
-							"QStatusBar::item {border: 1px solid #95c8d8; "
+							"QStatusBar::item {border: 1px solid #313335; "
 								"border-radius: 3px; }"
 								
 							)
+		
+		self.statusBarRed = ("QStatusBar {color:red;} ")
 							
 		self.statusBar_XY	= (	"QLabel {border: none; "
 								"background-color: qlineargradient(spread:pad x1:0.45, y1:0.3695, x2:0.427, y2:0, "
@@ -67,6 +71,15 @@ class GUI_Stylesheets(QObject):
 								"color: black; }"			
 							)			
 							
+		self.NM_statusBar_XY	= (	"QLabel {border: none; "
+								"background-color: qlineargradient(spread:pad x1:0.45, y1:0.3695, x2:0.427, y2:0, "
+								"stop:0 rgba(242, 242, 242, 0), "
+								"stop:1 rgba(242,242,242, 0)); "						
+								"font: 20 px; "
+								"font-weight: bold; "
+								"color: white; }"			
+							)			
+							
 		self.statusBar_widgets	= (	"QLabel {border: none; "
 								"background-color: qlineargradient(spread:pad x1:0.45, y1:0.3695, x2:0.427, y2:0, "
 								"stop:0 rgba(242, 242, 242, 0), "
@@ -74,6 +87,15 @@ class GUI_Stylesheets(QObject):
 								"font: 20 px; "
 								"font-weight: lighter; "
 								"color: black; }"			
+							)			
+							
+		self.NM_statusBar_widgets	= (	"QLabel {border: none; "
+								"background-color: qlineargradient(spread:pad x1:0.45, y1:0.3695, x2:0.427, y2:0, "
+								"stop:0 rgba(242, 242, 242, 0), "
+								"stop:1 rgba(242,242,242, 0)); "						
+								"font: 20 px; "
+								"font-weight: lighter; "
+								"color: white; }"			
 							)			
 		
 		self.videoStream = 	("background-color: qlineargradient(spread:pad x1:0.45, y1:0.3695, x2:0.427, y2:0, "
@@ -125,6 +147,26 @@ class GUI_Stylesheets(QObject):
 								"border-style: outset; "
 								"border-radius: 4px"
 							)
+							
+		self.webButton	=	("background-color:qlineargradient(spread:pad x1 : 0.63, y1 : 0.65, x2 : 0.427, y2 : 0, "
+								"stop:0 rgba(255, 153, 0, 240), "
+								"stop:1 rgba(255,255,255,255));"
+								"border-style: outset; "
+								"border-radius: 4px; "
+								"border-width: 1px; "	
+								"border-color: black; "
+								"padding: 4px"
+							)
+							
+		self.webButtonOn	=	("background-color:qlineargradient(spread:pad x1 : 0.63, y1 : 0.65, x2 : 0.427, y2 : 0, "
+									"stop:0 rgba(254, 127, 156, 240), "
+									"stop:1 rgba(255,255,255,255));"
+									"border-style: outset; "
+									"border-radius: 4px; "
+									"border-width: 1px; "
+									"border-color: black; "
+									"padding: 4px"
+								)
 
 		self.sliderLabel =	("font: bold 14px Verdana; "
 							"color: white; "

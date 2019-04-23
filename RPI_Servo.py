@@ -79,8 +79,12 @@ class QServoHorizontalThread(QThread):
             
             # Set Y value of track pad to servo position
             if self.setYPOS != False:
-                self.leftRightMotor.angle = self.yPosition
-                self.setYPOS = False
+                try:
+                    self.leftRightMotor.angle = self.yPosition
+                except ValueError as e: 
+                    print(e)
+                finally:
+                    self.setYPOS = False
             
             #Set for left key "A" to move camera left
             if self.left != False:
@@ -178,8 +182,12 @@ class QServoVerticalThread(QThread):
             
             # Set Y value of track pad to servo position
             if self.setXPOS != False:
-                self.upDownMotor.angle = self.xPosition
-                self.setXPOS = False
+                try:
+                    self.upDownMotor.angle = self.xPosition
+                except ValueError as e: 
+                    print(e)
+                finally:
+                    self.setXPOS = False
             
             #Set for left key "W" to move camera up
             if self.up != False:

@@ -3,6 +3,12 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, Q
 from PyQt5.QtGui import QPixmap, QIcon, QFont, QTextCursor, QPalette, QImage, QBrush
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
 
+# User made file
+from GUI_Stylesheets import GUI_Stylesheets
+
+# Instantiate style sheets for GUI Objects
+GUI_Style = GUI_Stylesheets()
+
 #GUI Classes
 # Pushbutton class to enable webStream
 class WebStream_Button(QPushButton):         #WebStream button
@@ -10,31 +16,24 @@ class WebStream_Button(QPushButton):         #WebStream button
         super(WebStream_Button, self).__init__()
         self.setText(text)
         self.setParent(window)
+        self.large_textbox = consoleLog
+        self.Web_Stream = webThread
         
         # Connecting Signals
-        self.webStream.Web_Stream_signal.connect(self.Web_Stream_ON)
-
+        self.Web_Stream.Web_Stream_signal.connect(self.Web_Stream_ON)
         
     # Function call for the click event
     def On_Click(self):
-        pass
-        
-    # Button turns red for activated
+        self.setStyleSheet(GUI_Style.webButtonOn)   # Button turns red for activated
 
     # Function call for the Un_click event
     def Un_Click(self):
-        self.Reset_GUI()
-        
+        self.Web_Stream.StartStreaming(True)
     
     # Funtion call for rweb stream on acknoledgment
     def Web_Stream_ON(self, string):
             self.WriteToConsole(string)             # write web stream enabled 
-        
-    #Resets the necessary objects 
-    def Reset_GUI(self):
-        pass
-        
-                                
+                 
     # Function call to write to Console Log
     def WriteToConsole(self, new_input):
             self.old_window = self.large_textbox.toPlainText()

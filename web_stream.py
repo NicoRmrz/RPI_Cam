@@ -7,7 +7,7 @@ import socketserver
 from threading import Condition
 from http import server
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
-from picamera.exc import PiCameraValueError, PiCameraMMALError
+from picamera.exc import PiCameraValueError, PiCameraMMALError, PiCameraAlreadyRecording
 
 Port_Number = 7227  # Port open on RPI Network
 client_list = []         # List of connected users
@@ -131,8 +131,8 @@ class WebStream_Thread(QThread):
     def __init__(self, RPICamera):
         QThread.__init__(self)
         self.camera = RPICamera
-        #~ global camera 
-        #~ camera = self.camera
+        global camera 
+        camera = self.camera
         self.exitProgram = False
         self.Server_Ready = False
         self.Stop_Ready = False
@@ -155,16 +155,22 @@ class WebStream_Thread(QThread):
             self.camera.stop_recording(splitter_port = 3)
             self.Stop_Ready = False
                     
-    #Sets up the program to stop web stream
+    #Sets up the program to start web stream
     def setStart(self, Start_Rdy):    
         self.Start_Ready = Start_Rdy 
         rec_status = self.camera.recording
        
         if (self.Start_Ready != False and rec_status != True):
-            self.camera.start_recording(output, format='mjpeg', splitter_port = 3)
-            self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
-            self.camera.annotate_foreground = Color('black')
-            self.Start_Ready = False
+            try:
+                self.camera.start_recording(output, format='mjpeg', splitter_port = 3)
+                self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
+                self.camera.annotate_foreground = Color('black')
+            
+            except PiCameraAlreadyRecording as e:
+                print(e)
+            
+            finally:
+                self.Start_Ready = False
                     
     #Functions runs from .start()
     def run(self):
@@ -172,15 +178,19 @@ class WebStream_Thread(QThread):
 
         while (1):
             if (self.Server_Ready != False):
-                self.camera.start_recording(output, format='mjpeg', splitter_port = 3)
-                self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
-                self.camera.annotate_foreground = Color('black')
+                try:
+                    self.camera.start_recording(output, format='mjpeg', splitter_port = 3)
+                    self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
+                    self.camera.annotate_foreground = Color('black')
 
-                address = ('', Port_Number)
-                server = StreamingServer(address, StreamingHandler)
-                print('Starting server, use <Ctrl-C> to stop')
-                Steam_Out('Starting server, use <Ctrl-C> to stop')
-                server.serve_forever()
+                    address = ('', Port_Number)
+                    server = StreamingServer(address, StreamingHandler)
+                    #~ print('Starting server, use <Ctrl-C> to stop')
+                    self.Stream_Out('Starting server, use <Ctrl-C> to stop')
+                    server.serve_forever()
+                    
+                except PiCameraAlreadyRecording as e: 
+                    self.Stream_Out(e)
                     
             if(self.exitProgram == True):
                 self.exitProgram = False

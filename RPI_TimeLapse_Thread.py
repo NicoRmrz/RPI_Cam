@@ -13,6 +13,7 @@ Main_path = os.getcwd() + "/"
 Image_Path = Main_path + "Snapshots/"
 Video_Path = Main_path + "Videos/"
 TimeLapse_Path = Main_path + "Time_Lapse/"
+WAIT_BETWEEN_CAPTURE = 5
 
 class QRPITimeLapseThread(QThread):
 
@@ -68,17 +69,17 @@ class QRPITimeLapseThread(QThread):
 				if filename.startswith('img'):
 					 os.unlink(filename)
 					 
-	#Function to get and emit recording status 
-	def Get_Rec_Status(self):
-			rec_status = self.camera.recording
+	#~ #Function to get and emit recording status 
+	#~ def Get_Rec_Status(self):
+			#~ rec_status = self.camera.recording
 			
-			#Snap taken from recording
-			if (rec_status != False or self.TimeLapse_Ready != False):
-					self.Status_Signal.emit(1) 
+			#~ #Snap taken from recording
+			#~ if (rec_status != False or self.TimeLapse_Ready != False):
+					#~ self.Status_Signal.emit(1) 
 				
-			#Snap taken by itself
-			else:
-					self.Status_Signal.emit(0)
+			#~ #Snap taken by itself
+			#~ else:
+					#~ self.Status_Signal.emit(0)
 			
 	#Function to reset video stream annotation text and background colors when stop button is pressed
 	def reset_Stream(self):
@@ -110,7 +111,7 @@ class QRPITimeLapseThread(QThread):
 										curr_path, filename = ntpath.split(filename)									
 										self.sendImgName(filename)
 																			
-										sleep(5)  # wait 5 seconds between iamges
+										sleep(WAIT_BETWEEN_CAPTURE)  # wait in seconds between iamges
 										
 										#If camera is pressed during timelapse
 										if (self.Snapshot_Ready != False and self.Stop_Rec != True):
