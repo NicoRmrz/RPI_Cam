@@ -106,7 +106,16 @@ class GUI_Stylesheets(QObject):
 		self.consoleLog	=	("font: 12px Verdana; "
 							"background-color: qlineargradient(spread:pad x1:0.45, y1:0.3695, x2:0.427, y2:0, "
 								"stop:0 rgba(242, 242, 242, 240), "
-								"stop:1 rgba(255,255,255,255))"
+								"stop:1 rgba(255,255,255,255)); "
+								"color: black; "
+							)
+		
+		self.NM_consoleLog	=	("font: 12px Verdana; "
+							"background-color: qlineargradient(spread:pad x1:0.45, y1:0.3695, x2:0.427, y2:0, "
+								"stop:0 rgba(242,242,242, 0), "
+								"stop:1 rgba(242,242,242, 0));"
+								"color: white; "
+								"border: none;"
 							)
 		
 		self.progressBar = 	("QProgressBar::chunk {background-color: #CD96CD;} "

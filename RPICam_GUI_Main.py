@@ -25,7 +25,7 @@ from GUI_Stylesheets import GUI_Stylesheets
 from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
-appVersion = "1.8"      # Update version
+appVersion = "1.9"      # Update version
 
 #Initial postion of servos
 horizontal_pos = 90
@@ -52,6 +52,21 @@ Up_Button_Path = Main_path + 'Icon_Image/upButton.png'
 Down_Button_Path = Main_path + 'Icon_Image/downButton.png'
 Freelook_Path = Main_path + 'Icon_Image/freelook1.png'
 
+# Create folders for pictures/ videos
+Image_Path = Main_path + "Snapshots/"
+Video_Path = Main_path + "Videos/"
+TimeLapse_Path = Main_path + "Time_Lapse/"
+
+if not os.path.exists(Image_Path):
+    os.makedirs(Image_Path)
+    
+if not os.path.exists(Video_Path):
+    os.makedirs(Video_Path)
+    
+if not os.path.exists(TimeLapse_Path):
+    os.makedirs(TimeLapse_Path)
+    
+    
 # Instantiate style sheets for GUI Objects
 GUI_Style = GUI_Stylesheets()
 
@@ -89,8 +104,8 @@ class Stream_Video(QLabel):
              
     def TimeLapsetoGUI(self, input_tlapse):
         self.Tlapse_img = input_tlapse
-        #~ pixmap = QPixmap(self.Tlapse_img)
-        #~ self.setPixmap(pixmap)       
+        pixmap = QPixmap(self.Tlapse_img)
+        self.setPixmap(pixmap)       
         
 # Class to reset button icons
 class Button_Reset_Handler(QObject):
@@ -535,7 +550,7 @@ class Window(QMainWindow):
         
     # Create Main Logo Button
     def MainLogoButton(self):
-        self.Logo_btn = Logo_Button(self, "", self.LargeTextBox, self.statusBar, self.xHorizontal, self.yVertical, self.res)
+        self.Logo_btn = Logo_Button(self, "", self.LargeTextBox, self.statusBar, self.xHorizontal, self.yVertical, self.res, self.LargeTextBox)
         self.Logo_btn.setStyleSheet(GUI_Style.startButton)
         self.Logo_btn.pressed.connect(self.Logo_btn.On_Click)
         self.Logo_btn.released.connect(self.Logo_btn.Un_Click)
@@ -956,3 +971,4 @@ if __name__ == "__main__":
 # 1.6 - Added status bar located bottom left - Mar 12, 2019
 # 1.7 - Added thread for smoother motor movements. Removed Sliders tab - Mar 23, 2019
 # 1.8 - Moved starting web stream to a button. Added night secret mode button. - Apr 23, 2019
+# 1.9 - Create folder path if not created at start up. - May 2, 2019

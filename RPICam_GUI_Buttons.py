@@ -326,7 +326,7 @@ class Logo_Button(QPushButton):         # Secret Logobutton
     NIGHT_MODE = False
 
     # Initializes the necessary objects into the button class for control
-    def __init__(self, window, text, input_largetextbox, statusBar, xPOS, yPOS, res):
+    def __init__(self, window, text, input_largetextbox, statusBar, xPOS, yPOS, res, consoleLog):
         super(Logo_Button, self).__init__()
         self.setText(text)
         self.setParent(window)
@@ -336,6 +336,7 @@ class Logo_Button(QPushButton):         # Secret Logobutton
         self.xHorizontal = xPOS
         self.yVertical = yPOS
         self.res = res
+        self.LargeTextBox = consoleLog
 
     # Function call for the click event
     def On_Click(self):
@@ -351,14 +352,15 @@ class Logo_Button(QPushButton):         # Secret Logobutton
             self.Regular_Mode()
             self.NIGHT_MODE = False
             
-        # Night Mode
+    # Night Mode
     def Night_Mode(self):
         self.mainWindow.setStyleSheet(GUI_Style.NM_mainWindow)
         self.statusBar.setStyleSheet(GUI_Style.NM_statusBarWhite)
         self.xHorizontal.setStyleSheet(GUI_Style.NM_statusBar_XY)
         self.yVertical.setStyleSheet(GUI_Style.NM_statusBar_XY)
         self.res.setStyleSheet(GUI_Style.NM_statusBar_widgets)
-
+        self.LargeTextBox.setStyleSheet(GUI_Style.NM_consoleLog)
+        
     # Regular Mode
     def Regular_Mode(self):
         self.mainWindow.setStyleSheet(GUI_Style.mainWindow)
@@ -366,6 +368,7 @@ class Logo_Button(QPushButton):         # Secret Logobutton
         self.xHorizontal.setStyleSheet(GUI_Style.statusBar_XY)
         self.yVertical.setStyleSheet(GUI_Style.statusBar_XY)
         self.res.setStyleSheet(GUI_Style.statusBar_widgets)
+        self.LargeTextBox.setStyleSheet(GUI_Style.consoleLog)
         
      # Function call to write to Console Log
     def WriteToConsole(self, new_input):
