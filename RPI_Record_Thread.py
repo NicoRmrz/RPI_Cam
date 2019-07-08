@@ -189,7 +189,7 @@ class QRPIRecordVideoThread(QThread):
 							self.exitProgram = False
 							break
 
-					sleep(1)		  
+					sleep(0.2)		  
 
 	#Emits video recording finished
 	def Recording_Finished(self, Name_Scheme):
