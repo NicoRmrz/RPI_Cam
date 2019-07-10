@@ -64,7 +64,7 @@ class QRPIVideoStreamThread(QThread):
 				self.exitProgram = False
 				break
             
-			time.sleep(0.1)
+			time.sleep(0.01)
             
         #Emits the estring to console log GUI
 	def Video_Streaming(self,stream_str):

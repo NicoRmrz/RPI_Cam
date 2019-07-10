@@ -25,7 +25,7 @@ from GUI_Stylesheets import GUI_Stylesheets
 from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
-appVersion = "1.9"      # Update version
+appVersion = "2.0"      # Update version
 
 #Initial postion of servos
 horizontal_pos = 90
@@ -243,7 +243,7 @@ class Window(QMainWindow):
         super(Window, self).__init__()
         self.setGeometry(50,50,1200,700)
         self.setWindowTitle("RPI Cam v" + appVersion)
-        self.setStyleSheet(GUI_Style.mainWindow)
+        self.setStyleSheet(GUI_Style.NM_mainWindow)
         self.setWindowIcon(QIcon(Icon_Path))
         
         # Initialize Pi Camera for all threads
@@ -295,6 +295,7 @@ class Window(QMainWindow):
         # Create Tabs
         self.MyTabs = QTabWidget()
         self.MyTabs.setStyleSheet(GUI_Style.tabs)
+        self.MyTabs.setMaximumWidth(400)
         
         self.MainTab = QWidget()
         self.SettingsTab = QWidget()
@@ -520,6 +521,7 @@ class Window(QMainWindow):
         
         # start streaming video on start up
         self.Video_Stream.Set_Video_Stream_Ready(True)
+        self.Logo_btn.Un_Click()
         
         # Display GUI Objects
         self.show()
@@ -560,7 +562,7 @@ class Window(QMainWindow):
     # Create Window to stream live feed
     def VideoStream(self):
         self.Vid_Stream = Stream_Video(self, self.Video_Stream, self.RPIRecordThread, self.RPICaptureThread, self.RPITimeLapseThread)
-        self.Vid_Stream.setMinimumSize(725, 480)
+        self.Vid_Stream.setMinimumSize(800, 480)
         self.Vid_Stream.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.Vid_Stream.setBackgroundRole(QPalette.Base)
         self.Vid_Stream.setScaledContents(True)
