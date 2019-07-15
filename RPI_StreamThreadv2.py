@@ -4,6 +4,7 @@ import time
 from time import sleep
 import datetime
 import os
+from io import BytesIO
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 
@@ -13,14 +14,17 @@ Image_Path = Main_path + "Snapshots/"
                 
 class QRPIVideoStreamThread(QThread):
 	Video_Stream_signal = pyqtSignal(str)
+	#~ Video_Stream_signal = pyqtSignal(object)
 	Error_Signal = pyqtSignal(str) 
     
 	def __init__(self, RPICamera):
 		QThread.__init__(self)
 		self.camera = RPICamera
-
+		self.my_stream = BytesIO()
 		self.VideoStream_Ready = False
 		self.exitProgram = False
+		self.filename =  't'
+		#~ self.filename =  Image_Path + 'Stream_Temp'
         
     #Sets up the program to initiate video stream
 	def Set_Video_Stream_Ready(self, stream_Rdy):
@@ -43,14 +47,14 @@ class QRPIVideoStreamThread(QThread):
 					self.camera.annotate_text = ("Nico's RPI Cam\n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 					self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
 				
-					for i, filename in enumerate(self.camera.capture_continuous(Image_Path + 'Stream_Temp', format = 'jpeg', splitter_port= 2)):
-						self.camera.annotate_text = ("Nico's RPI Cam\n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+					self.camera.capture_sequence(self.filename, splitter_port= 2) 
+					#~ for i, filename in enumerate(self.camera.capture_continuous(self.filename, format = 'jpeg', splitter_port= 2)): 
 
-						#emit frame captured
-						self.Video_Streaming(filename)
+					#emit frame captured
+					self.Video_Streaming(self.filename)
 
-						if (self.VideoStream_Ready != True):
-							break
+					#~ if (self.VideoStream_Ready != True):
+						#~ break
 							
 				except PiCameraValueError:
 					self.SendError("Stream Error.. Try Again!")	
@@ -63,7 +67,7 @@ class QRPIVideoStreamThread(QThread):
 				self.exitProgram = False
 				break
             
-			time.sleep(0.01)
+			time.sleep(0.02)
             
         #Emits the estring to console log GUI
 	def Video_Streaming(self,stream_str):

@@ -167,11 +167,12 @@ class WebStream_Thread(QThread):
                 self.camera.annotate_foreground = Color('black')
             
             except PiCameraAlreadyRecording as e:
-                print(e)
+                self.Stream_Out(str(e))
             
             finally:
                 self.Start_Ready = False
                     
+    
     #Functions runs from .start()
     def run(self):
         self.setPriority(QThread.HighestPriority)
@@ -187,10 +188,15 @@ class WebStream_Thread(QThread):
                     server = StreamingServer(address, StreamingHandler)
                     #~ print('Starting server, use <Ctrl-C> to stop')
                     self.Stream_Out('Starting server, use <Ctrl-C> to stop')
+                              
                     server.serve_forever()
                     
                 except PiCameraAlreadyRecording as e: 
-                    self.Stream_Out(e)
+                    self.Stream_Out(str(e))
+                    #self.Server_Ready = False
+                    #~ self.setStop(True)
+                    #~ sleep (1)
+                    #~ self.setStart(True)
                     
             if(self.exitProgram == True):
                 self.exitProgram = False
@@ -200,7 +206,7 @@ class WebStream_Thread(QThread):
             
      #Emits the string to console log GUI
     def Stream_Out(self,strm_str):
-            self.Web_Stream_signal.emit(strm_str)                          
+        self.Web_Stream_signal.emit(strm_str)                          
 
 #Intantiate Global Output Stream and start web streaming
 output = StreamingOutput()        

@@ -18,19 +18,34 @@ class WebStream_Button(QPushButton):         #WebStream button
         self.setParent(window)
         self.large_textbox = consoleLog
         self.Web_Stream = webThread
-        
+        self.AmIStreaming = False
+        self.Web_Stream.setStop(True)
+
         # Connecting Signals
         self.Web_Stream.Web_Stream_signal.connect(self.Web_Stream_ON)
         
     # Function call for the click event
     def On_Click(self):
-        self.setStyleSheet(GUI_Style.webButtonOn)   # Button turns red for activated
-
+        pass
+        
     # Function call for the Un_click event
     def Un_Click(self):
-        self.Web_Stream.StartStreaming(True)
-    
-    # Funtion call for rweb stream on acknoledgment
+        if self.AmIStreaming != True:
+            self.setStyleSheet(GUI_Style.webButtonOn)   # Button turns red for activated
+            self.Web_Stream.setStart(True)
+            self.setText("Streaming")
+            self.WriteToConsole("Web Stream URL: 69.4.154.148:7227")  
+            self.AmIStreaming  = True
+            
+        elif self.AmIStreaming != False:
+            self.setStyleSheet(GUI_Style.webButton)   # Button turns red for activated
+            self.setText("Start Web Stream")
+            self.Web_Stream.setStop(True)
+            self.WriteToConsole("Web Stream Disabled")             # write web stream disabled 
+            self.AmIStreaming = False
+
+
+    # Funtion call for web stream on acknoledgment
     def Web_Stream_ON(self, string):
             self.WriteToConsole(string)             # write web stream enabled 
                  

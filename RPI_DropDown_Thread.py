@@ -67,6 +67,8 @@ class QDropDownThread(QThread):
 					try:
 						self.camera.resolution = (1640, 1232)
 						self.camera.framerate = 30 
+						self.camera.annotate_text_size = 45
+
 						
 						#To emit done with selection
 						self.changeResolutionFramerate("1640x1232", "30")
@@ -84,6 +86,8 @@ class QDropDownThread(QThread):
 					try:
 						self.camera.resolution = (1640, 922)
 						self.camera.framerate = 30 
+						self.camera.annotate_text_size = 40
+
 						
 						#To emit done with selection
 						self.changeResolutionFramerate("1640x922", "30")
@@ -101,6 +105,7 @@ class QDropDownThread(QThread):
 					try:
 						self.camera.resolution = (1280, 720)
 						self.camera.framerate = 40 
+						self.camera.annotate_text_size = 30
 						
 						#To emit done with selection
 						self.changeResolutionFramerate("1280x720", "40")
@@ -118,6 +123,7 @@ class QDropDownThread(QThread):
 					try:
 						self.camera.resolution = (640, 480)
 						self.camera.framerate = 60 
+						self.camera.annotate_text_size = 16
 						
 						#To emit done with selection
 						self.changeResolutionFramerate("640x480", "60")

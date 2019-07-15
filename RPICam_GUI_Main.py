@@ -4,7 +4,7 @@ import time
 import sys
 import PyQt5
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, QLabel, QCheckBox, QTextEdit, QStatusBar,QProgressBar, QSizePolicy, QAbstractItemView, QWidget, QTabWidget, QHBoxLayout, QVBoxLayout, QSlider
-from PyQt5.QtGui import QPixmap, QIcon, QFont, QTextCursor, QPalette, QImage, QBrush
+from PyQt5.QtGui import QPixmap, QIcon, QFont, QTextCursor, QPalette, QImage, QBrush, QImage
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
 
 #Imports from made files
@@ -16,7 +16,8 @@ from RPICam_GUI_Settings import WebStream_Button, Brightness_Slider, Contrast_Sl
 from RPI_Capture_Thread import QRPICaptureThread
 from RPI_Record_Thread import QRPIRecordVideoThread, QPBarThread
 from RPI_TimeLapse_Thread import QRPITimeLapseThread
-from RPI_StreamThread import QRPIVideoStreamThread
+#~ from RPI_StreamThread import QRPIVideoStreamThread
+from RPI_StreamThreadv2 import QRPIVideoStreamThread
 from RPI_Slider_Thread import QSliderThread
 from RPI_DropDown_Thread import QDropDownThread
 from Sleeper_Thread import QTimeThread
@@ -248,8 +249,7 @@ class Window(QMainWindow):
         
         # Initialize Pi Camera for all threads
         PiCam = Setup_PiCam()
-        PiCam.PiCam_Configuration()
-        self.camera = PiCam.camera  
+        self.camera = PiCam.PiCam_Configuration() 
         
         # Initialize Servo for PiCamera
         PiServo = Initialize_Servo()
@@ -288,6 +288,12 @@ class Window(QMainWindow):
         self.leftRightServoThread.start()
         self.upDownServoThread.start()
     
+        # Start Web server at start up
+        self.Web_Stream.StartStreaming(True)
+        self.Web_Stream.setStop(True)
+        self.Web_Stream.setStart(False)
+
+
         # This builds the main widget for the GUI window to hold
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
@@ -666,7 +672,7 @@ class Window(QMainWindow):
     ''' Settings Tab GUI Objects'''
     # Start web stream button
     def webStream_Btn_GUI(self):
-        self.webStream_Btn = WebStream_Button(self, "Web Stream", self.LargeTextBox, self.Web_Stream)
+        self.webStream_Btn = WebStream_Button(self, "Start Web Stream", self.LargeTextBox, self.Web_Stream)
         self.webStream_Btn.setStyleSheet(GUI_Style.webButton)
         self.webStream_Btn.pressed.connect(self.webStream_Btn.On_Click)
         self.webStream_Btn.released.connect(self.webStream_Btn.Un_Click) 
@@ -974,3 +980,5 @@ if __name__ == "__main__":
 # 1.7 - Added thread for smoother motor movements. Removed Sliders tab - Mar 23, 2019
 # 1.8 - Moved starting web stream to a button. Added night secret mode button. - Apr 23, 2019
 # 1.9 - Create folder path if not created at start up. - May 2, 2019
+# 2.0 - Rewrite stream thread from capture_contnious to capture_sequence, wed stream button fix to start server but disable stream at startup. - July 15, 2019
+
