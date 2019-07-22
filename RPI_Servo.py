@@ -277,7 +277,6 @@ class QServoTrackPadThread(QThread):
 
         while(1):
            
-            
             # set for upDownSlider servo to move
             if self.upDownSlider != False:        
                 self.upDownMotor.angle = self.upDownValue
@@ -295,7 +294,7 @@ class QServoTrackPadThread(QThread):
                 self.exitProgram = False
                 break
 
-            sleep(0.5)
+            sleep(0.2)
 
 
     def horizontalDone(self, string, value):

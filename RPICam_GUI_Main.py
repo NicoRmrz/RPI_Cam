@@ -26,7 +26,7 @@ from GUI_Stylesheets import GUI_Stylesheets
 from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
-appVersion = "2.0"      # Update version
+appVersion = "2.1"      # Update version
 
 #Initial postion of servos
 horizontal_pos = 90
@@ -90,22 +90,19 @@ class Stream_Video(QLabel):
         
     def StreamToGUI(self, input_video):
         self.video_input = input_video
-        pixmap = QPixmap(self.video_input)
-        self.setPixmap(pixmap)
+        #~ pixmap = QPixmap(self.video_input)
+        #~ self.setPixmap(pixmap)
         
     def ImagetoGUI(self, input_pic):
-        self.capturedImage = input_pic
-        pixmap = QPixmap(self.capturedImage)
+        pixmap = QPixmap(input_pic)
         self.setPixmap(pixmap)
         
     def RecordtoGUI(self, input_rec):
-        self.recording = input_rec
-        pixmap = QPixmap(self.recording)
+        pixmap = QPixmap(input_rec)
         self.setPixmap(pixmap)  
              
     def TimeLapsetoGUI(self, input_tlapse):
-        self.Tlapse_img = input_tlapse
-        pixmap = QPixmap(self.Tlapse_img)
+        pixmap = QPixmap(input_tlapse)
         self.setPixmap(pixmap)       
         
 # Class to reset button icons
@@ -249,7 +246,7 @@ class Window(QMainWindow):
         
         # Initialize Pi Camera for all threads
         PiCam = Setup_PiCam()
-        self.camera = PiCam.PiCam_Configuration() 
+        self.camera, self.rawCapture = PiCam.PiCam_Configuration() 
         
         # Initialize Servo for PiCamera
         PiServo = Initialize_Servo()
@@ -264,7 +261,7 @@ class Window(QMainWindow):
         self.RPICaptureThread = QRPICaptureThread(self.camera)
         self.RPIRecordThread = QRPIRecordVideoThread(self.camera)
         self.RPITimeLapseThread = QRPITimeLapseThread(self.camera)
-        self.Video_Stream = QRPIVideoStreamThread(self.camera)
+        self.Video_Stream = QRPIVideoStreamThread(self.camera, self.rawCapture)
         self.Web_Stream =  WebStream_Thread(self.camera)
         self.Timer_Thread = QTimeThread()
         self.PBarThread = QPBarThread(self.RPIRecordThread)
@@ -613,7 +610,7 @@ class Window(QMainWindow):
         self.res = QLabel()
         self.res.setMinimumSize(50, 15)
         self.res.setStyleSheet(GUI_Style.statusBar_widgets)
-        self.res.setText("| res 1640x1232")
+        self.res.setText("| res 1280x720")
         self.res.setAlignment(Qt.AlignCenter)
         
         self.statusBar.addPermanentWidget(self.xHorizontal, 0)
@@ -981,4 +978,4 @@ if __name__ == "__main__":
 # 1.8 - Moved starting web stream to a button. Added night secret mode button. - Apr 23, 2019
 # 1.9 - Create folder path if not created at start up. - May 2, 2019
 # 2.0 - Rewrite stream thread from capture_contnious to capture_sequence, wed stream button fix to start server but disable stream at startup. - July 15, 2019
-
+# 2.1 - Adding Open CV to pi camera for image processing

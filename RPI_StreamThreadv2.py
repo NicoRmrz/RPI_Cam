@@ -1,5 +1,8 @@
 from picamera import PiCamera, Color
 from picamera.exc import PiCameraValueError, PiCameraRuntimeError
+from picamera.array import PiRGBArray
+import numpy as np
+
 import time
 from time import sleep
 import datetime
@@ -13,18 +16,18 @@ Main_path = os.getcwd() + "/"
 Image_Path = Main_path + "Snapshots/"
                 
 class QRPIVideoStreamThread(QThread):
-	Video_Stream_signal = pyqtSignal(str)
-	#~ Video_Stream_signal = pyqtSignal(object)
+	Video_Stream_signal = pyqtSignal(np.ndarray)
+	#~ Video_Stream_signal = pyqtSignal(str)
 	Error_Signal = pyqtSignal(str) 
     
-	def __init__(self, RPICamera):
+	def __init__(self, RPICamera, raw):
 		QThread.__init__(self)
 		self.camera = RPICamera
-		self.my_stream = BytesIO()
+		self.raw = raw
+
 		self.VideoStream_Ready = False
 		self.exitProgram = False
 		self.filename =  't'
-		#~ self.filename =  Image_Path + 'Stream_Temp'
         
     #Sets up the program to initiate video stream
 	def Set_Video_Stream_Ready(self, stream_Rdy):
@@ -47,19 +50,29 @@ class QRPIVideoStreamThread(QThread):
 					self.camera.annotate_text = ("Nico's RPI Cam\n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 					self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
 				
-					self.camera.capture_sequence(self.filename, splitter_port= 2) 
-					#~ for i, filename in enumerate(self.camera.capture_continuous(self.filename, format = 'jpeg', splitter_port= 2)): 
+					#~ self.camera.capture_sequence(self.filename, splitter_port= 2) 
+					#~ for i, frame in enumerate(self.camera.capture_continuous(self.raw, format = 'bgr', splitter_port= 2)): 
+					for frame in (self.camera.capture_continuous(self.raw, format = 'bgr', splitter_port= 2)): 
 
-					#emit frame captured
-					self.Video_Streaming(self.filename)
+						# grab the raw NumPy array representing the image, then initialize the timestamp and occupied/unoccupied text
+						image = frame.array
+						
+						#emit frame data captured
+						#~ self.Video_Streaming(self.filename)
+						self.Video_Streaming(image)
 
-					#~ if (self.VideoStream_Ready != True):
-						#~ break
+						# clear the stream in preparation for the next frame
+						self.raw.truncate(0)
+						
+						if (self.VideoStream_Ready != True):
+							break
 							
-				except PiCameraValueError:
+				except PiCameraValueError as e:
+					print(e)
 					self.SendError("Stream Error.. Try Again!")	
 							
-				except PiCameraRuntimeError:
+				except PiCameraRuntimeError as e:
+					print(e)
 					self.SendError("Stream Error.. Try Again!")	
 					self.VideoStream_Ready = True
 			

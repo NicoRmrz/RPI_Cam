@@ -11,10 +11,12 @@ class Setup_PiCam(object):
         def PiCam_Configuration(self):
                 self.camera = PiCamera()  
                 self.camera.rotation = 180
-                
+                self.rawCapture = PiRGBArray(self.camera)
+
                 # allow the camera to warmup
                 sleep(0.1)
                 
-                return self.camera
+                #~ return self.camera
+                return self.camera, self.rawCapture
                 
 
