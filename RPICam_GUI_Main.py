@@ -17,6 +17,8 @@ from RPI_Capture_Thread import QRPICaptureThread
 from RPI_Record_Thread import QRPIRecordVideoThread, QPBarThread
 from RPI_TimeLapse_Thread import QRPITimeLapseThread
 #~ from RPI_StreamThread import QRPIVideoStreamThread
+from Handlers import Button_Reset_Handler, Error_Handler
+from StreamWindow import Stream_Video
 from RPI_StreamThreadv2 import QRPIVideoStreamThread
 from RPI_Slider_Thread import QSliderThread
 from RPI_DropDown_Thread import QDropDownThread
@@ -26,7 +28,7 @@ from GUI_Stylesheets import GUI_Stylesheets
 from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
-appVersion = "2.1"      # Update version
+appVersion = "2.2"      # Update version
 
 #Initial postion of servos
 horizontal_pos = 90
@@ -66,173 +68,10 @@ if not os.path.exists(Video_Path):
     
 if not os.path.exists(TimeLapse_Path):
     os.makedirs(TimeLapse_Path)
-    
-    
+        
 # Instantiate style sheets for GUI Objects
 GUI_Style = GUI_Stylesheets()
 
-# GUI Class to display camera feed on GUI
-class Stream_Video(QLabel):             
-        
-    def __init__(self, window, video_stream, Record_Thread, Capture_Thread, TimeLapse_Thread):
-        super(Stream_Video, self).__init__()
-        self.setParent(window)
-        self.RPI_GUIStream = video_stream
-        self.recordThread = Record_Thread
-        self.captureThread = Capture_Thread
-        self.timelapseThread = TimeLapse_Thread
-        
-        # Connecting thread (emits) to functions
-        self.RPI_GUIStream.Video_Stream_signal.connect(self.StreamToGUI)
-        self.captureThread.Send_Image_signal.connect(self.ImagetoGUI)
-        self.recordThread.Rec_GUI_signal.connect(self.RecordtoGUI)
-        self.timelapseThread.Time_Lapse_Signal.connect(self.TimeLapsetoGUI)
-        
-    def StreamToGUI(self, input_video):
-        self.video_input = input_video
-        #~ pixmap = QPixmap(self.video_input)
-        #~ self.setPixmap(pixmap)
-        
-    def ImagetoGUI(self, input_pic):
-        pixmap = QPixmap(input_pic)
-        self.setPixmap(pixmap)
-        
-    def RecordtoGUI(self, input_rec):
-        pixmap = QPixmap(input_rec)
-        self.setPixmap(pixmap)  
-             
-    def TimeLapsetoGUI(self, input_tlapse):
-        pixmap = QPixmap(input_tlapse)
-        self.setPixmap(pixmap)       
-        
-# Class to reset button icons
-class Button_Reset_Handler(QObject):
-        def __init__(self, captureThre, recordThre, timelapseThre, PBarThre, capture, record, timelapse, PBar, vidSteam, servoHThre, servoVThre, statusBar, xPosStausbar, yPosStausbar):
-                super(Button_Reset_Handler, self).__init__()
-                self.captureThread = captureThre
-                self.recordThread = recordThre
-                self.timelapseThread = timelapseThre
-                self.PBarThread = PBarThre
-                self.captureBtn = capture
-                self.recordBtn = record
-                self.timelapseBtn = timelapse
-                self.PBar = PBar
-                self.Video_Stream = vidSteam
-                self.servoHorizontalThread = servoHThre
-                self.servoVerticalThread = servoVThre
-                self.xPos = xPosStausbar
-                self.yPos = yPosStausbar
-                self.statusBar = statusBar
-                
-                # Connect signals to handler function
-                self.recordThread.Btn_Handler.connect(self.Button_Handler)
-                self.timelapseThread.Btn_Handler.connect(self.Button_Handler)
-                self.captureThread.Btn_Handler.connect(self.Button_Handler)
-                self.PBarThread.Btn_Handler.connect(self.Button_Handler)
-                self.servoHorizontalThread.Btn_Handler.connect(self.Button_Handler)
-                self.servoVerticalThread.Btn_Handler.connect(self.Button_Handler)
-                self.servoHorizontalThread.horizontal_Sig.connect(self.servo_Handler)
-                self.servoVerticalThread.vertical_Sig.connect(self.servo_Handler)
-                
-        # Resets button if button is pressed while recording video
-        def Button_Handler(self, string):
-                self.RstBtn = string
-                
-                if self.RstBtn == "Capture":
-                        self.captureBtn.setIcon(QIcon(Camera_Idle_Path))
-                        
-                elif self.RstBtn == "Record":     
-                        self.recordBtn.setIcon(QIcon(Video_Idle_Path))
-                        
-                elif self.RstBtn == "TimeLapse":
-                        self.timelapseBtn.setIcon(QIcon(TimeLapse_Idle_Path))           
-                        
-                elif self.RstBtn == "ProgressBar":
-                        self.PBar.setValue(0)           
-                        
-                elif self.RstBtn == "Stream":
-                        self.Video_Stream.Set_Video_Stream_Ready(True)          
-                        
-                elif self.RstBtn == "Left":
-                        pass
-                        #~ print ("Left done")         
-                        
-                elif self.RstBtn == "Right":
-                        pass
-                        #~ print ("Right done")           
-                        
-                elif self.RstBtn == "Up":
-                        pass
-                        #~ print ("Up done")           
-                        
-                elif self.RstBtn == "Down":
-                        pass
-                        #~ print ("Down done")           
-                        
-        # To put servo value to status bar 
-        def servo_Handler(self, string, value):
-                if string == 'horizontalMotor':
-                        if value == 'Min':
-                                self.statusBar.showMessage("Max RIGHT Movement Reached!", 2000) 
-                        
-                        elif value =='Max':
-                                self.statusBar.showMessage("Max LEFT Movement Reached!", 2000) 
-                        else:
-                                newVal = 180 - int(value)
-                                self.xPos.setText("| X: " + str(newVal))
-                        
-                elif string == 'verticalMotor':
-                        if value == 'Min':
-                                self.statusBar.showMessage("Max UP Movement Reached!", 2000) 
-                        
-                        elif value =='Max':
-                                self.statusBar.showMessage("Max DOWN Movement Reached!", 2000) 
-                        else:
-                                newVal = 180 - int(value)
-                                self.yPos.setText("| Y: " + str(newVal))
-
-        
-# Class to display error messages
-class Error_Handler(QObject):
-        def __init__(self, consoleLog, captureThre, recordThre, timelapseThre, videoStreamThre, dropDownThre, webStreamThre, statusBar):
-                super(Error_Handler, self).__init__()
-                self.large_textbox = consoleLog
-                self.captureThread = captureThre
-                self.recordThread = recordThre
-                self.timelapseThread = timelapseThre
-                self.videoStream = videoStreamThre
-                self.dropDown = dropDownThre
-                self.Web_Stream = webStreamThre
-                self.statusBar = statusBar
-                
-                # Connect signals to error function
-                self.recordThread.Error_Signal.connect(self.Show_Error)
-                self.timelapseThread.Error_Signal.connect(self.Show_Error)
-                self.captureThread.Error_Signal.connect(self.Show_Error)
-                self.videoStream.Error_Signal.connect(self.Show_Error)
-                self.dropDown.Error_Signal.connect(self.Show_Error)
-                self.dropDown.Reset_Signal.connect(self.resetAllStreams)
-                
-        # Function to write error message to console log
-        def Show_Error(self, string):
-                self.errorMessage = string
-                self.statusBar.setStyleSheet(GUI_Style.statusBarRed)
-                self.statusBar.showMessage(self.errorMessage, 5000) 
-                
-        # Function to continue streams after any errors
-        def resetAllStreams(self, string):
-                self.videoStream.Set_Video_Stream_Ready(True)
-                self.Web_Stream.setStart(True)
-                
-        # Function call to write to Console Log
-        def WriteToConsole(self, new_input):
-                self.old_window = self.large_textbox.toPlainText()
-                self.new_window = self.old_window + '\n' + new_input
-                self.large_textbox.setText(self.new_window)
-                self.large_textbox.moveCursor(QTextCursor.End)
-                
-
-                
 # This will create the main window on the screen
 class Window(QMainWindow):
     
@@ -978,4 +817,5 @@ if __name__ == "__main__":
 # 1.8 - Moved starting web stream to a button. Added night secret mode button. - Apr 23, 2019
 # 1.9 - Create folder path if not created at start up. - May 2, 2019
 # 2.0 - Rewrite stream thread from capture_contnious to capture_sequence, wed stream button fix to start server but disable stream at startup. - July 15, 2019
-# 2.1 - Adding Open CV to pi camera for image processing
+# 2.1 - Adding Open CV to pi camera for image processing. Not Complete yet - July 22, 2019
+# 2.2 - Add new .py file for handlers and stream class

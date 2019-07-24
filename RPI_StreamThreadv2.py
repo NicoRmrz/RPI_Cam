@@ -2,7 +2,8 @@ from picamera import PiCamera, Color
 from picamera.exc import PiCameraValueError, PiCameraRuntimeError
 from picamera.array import PiRGBArray
 import numpy as np
-
+import imutils
+import cv2
 import time
 from time import sleep
 import datetime
@@ -49,20 +50,71 @@ class QRPIVideoStreamThread(QThread):
 					self.camera.annotate_foreground = Color('black')
 					self.camera.annotate_text = ("Nico's RPI Cam\n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 					self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
+					avg = None
 				
 					#~ self.camera.capture_sequence(self.filename, splitter_port= 2) 
 					#~ for i, frame in enumerate(self.camera.capture_continuous(self.raw, format = 'bgr', splitter_port= 2)): 
 					for frame in (self.camera.capture_continuous(self.raw, format = 'bgr', splitter_port= 2)): 
 
-						# grab the raw NumPy array representing the image, then initialize the timestamp and occupied/unoccupied text
+						# PiCam Stream configuration
+						self.camera.annotate_foreground = Color('black')
+						self.camera.annotate_text = ("Nico's RPI Cam\n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+						self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
+					
+						# grab the raw NumPy array representing the image
 						image = frame.array
 						
-						#emit frame data captured
-						#~ self.Video_Streaming(self.filename)
-						self.Video_Streaming(image)
+						# resize the frame, convert it to grayscale, and blur it
+						image = imutils.resize(image, width=500)
+						gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+						gray = cv2.GaussianBlur(gray, (21, 21), 0)
+ 
+						# if the average frame is None, initialize it
+						if avg is None:
+							print("[INFO] starting background model...")
+							avg = gray.copy().astype("float")
+		
+				
 
 						# clear the stream in preparation for the next frame
 						self.raw.truncate(0)
+						
+						# accumulate the weighted average between the current frame and
+						# previous frames, then compute the difference between the current
+						# frame and running average
+						cv2.accumulateWeighted(gray, avg, 0.5)
+						frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(avg))
+						
+						# threshold the delta image, dilate the thresholded image to fill
+						# in holes, then find contours on thresholded image
+						thresh = cv2.threshold(frameDelta, 5, 255, cv2.THRESH_BINARY)[1]
+						thresh = cv2.dilate(thresh, None, iterations=2)
+						cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+						cnts = imutils.grab_contours(cnts)
+					 
+						# loop over the contours
+						for c in cnts:
+							# if the contour is too small, ignore it
+							if cv2.contourArea(c) < 5000:
+								continue
+					 
+							# compute the bounding box for the contour, draw it on the frame,
+							# and update the text
+							(x, y, w, h) = cv2.boundingRect(c)
+							cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+							text = "Occupied"
+					 
+						# draw the text and timestamp on the frame
+						#~ ts = timestamp.strftime("%A %d %B %Y %I:%M:%S%p")
+						cv2.putText(image, "Room Status: {}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+						#cv2.putText(image, (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+		
+						# Open CV way of showing th eimagte
+						cv2.imshow("Security Feed", image)
+
+						
+						#emit frame data captured
+						self.Video_Streaming(image)
 						
 						if (self.VideoStream_Ready != True):
 							break
