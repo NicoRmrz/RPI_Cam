@@ -18,17 +18,14 @@ Image_Path = Main_path + "Snapshots/"
                 
 class QRPIVideoStreamThread(QThread):
 	Video_Stream_signal = pyqtSignal(np.ndarray)
-	#~ Video_Stream_signal = pyqtSignal(str)
 	Error_Signal = pyqtSignal(str) 
     
 	def __init__(self, RPICamera, raw):
 		QThread.__init__(self)
 		self.camera = RPICamera
 		self.raw = raw
-
 		self.VideoStream_Ready = False
 		self.exitProgram = False
-		self.filename =  't'
         
     #Sets up the program to initiate video stream
 	def Set_Video_Stream_Ready(self, stream_Rdy):
@@ -43,39 +40,58 @@ class QRPIVideoStreamThread(QThread):
 
 		while (1):
 			
-                        #Set Video Stream to GUI Qlabel
+			#Set Video Stream to GUI Qlabel
 			if (self.VideoStream_Ready != False):
 				try:
 					# PiCam Stream configuration
 					self.camera.annotate_foreground = Color('black')
-					self.camera.annotate_text = ("Nico's RPI Cam\n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+					ts = datetime.datetime.now().strftime("%d %B %Y %I:%M:%S%p")
+					self.camera.annotate_text = ("RPI Cam: " + ts)
 					self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
-					avg = None
 				
-					#~ self.camera.capture_sequence(self.filename, splitter_port= 2) 
-					#~ for i, frame in enumerate(self.camera.capture_continuous(self.raw, format = 'bgr', splitter_port= 2)): 
-					for frame in (self.camera.capture_continuous(self.raw, format = 'bgr', splitter_port= 2)): 
+					# If motion detection is checked 
+					self.motionDetection()
+					
+							
+				except PiCameraValueError as e:
+					print(e)
+					self.SendError("Stream Error.. Try Again!")	
+							
+				except PiCameraRuntimeError as e:
+					print(e)
+					self.SendError("Stream Error.. Try Again!")	
+					self.VideoStream_Ready = True
+			
+			if(self.exitProgram == True):
+				self.exitProgram = False
+				break
+            
+			time.sleep(1)
+			
+	def motionDetection(self):
+		avg = None
+
+		for frame in (self.camera.capture_continuous(self.raw, format = 'bgr', splitter_port= 2)): 
 
 						# PiCam Stream configuration
 						self.camera.annotate_foreground = Color('black')
-						self.camera.annotate_text = ("Nico's RPI Cam\n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+						ts = datetime.datetime.now().strftime("%d %B %Y %I:%M:%S%p")
+						self.camera.annotate_text = ("RPI Cam: " + ts)
 						self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
 					
 						# grab the raw NumPy array representing the image
 						image = frame.array
 						
 						# resize the frame, convert it to grayscale, and blur it
-						image = imutils.resize(image, width=500)
+						#~ image = imutils.resize(image, width=500)
 						gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 						gray = cv2.GaussianBlur(gray, (21, 21), 0)
  
 						# if the average frame is None, initialize it
 						if avg is None:
-							print("[INFO] starting background model...")
+							#print("[INFO] starting background model...")
 							avg = gray.copy().astype("float")
 		
-				
-
 						# clear the stream in preparation for the next frame
 						self.raw.truncate(0)
 						
@@ -99,40 +115,19 @@ class QRPIVideoStreamThread(QThread):
 								continue
 					 
 							# compute the bounding box for the contour, draw it on the frame,
-							# and update the text
 							(x, y, w, h) = cv2.boundingRect(c)
 							cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-							text = "Occupied"
+							#text = "Occupied"
 					 
 						# draw the text and timestamp on the frame
-						#~ ts = timestamp.strftime("%A %d %B %Y %I:%M:%S%p")
-						cv2.putText(image, "Room Status: {}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-						#cv2.putText(image, (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
-		
-						# Open CV way of showing th eimagte
-						cv2.imshow("Security Feed", image)
+						#~ ts = datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p")
+						#~ cv2.putText(image, "RPI Cam: " + ts, (2, 20), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 0, 0), 2)
 
-						
 						#emit frame data captured
 						self.Video_Streaming(image)
 						
 						if (self.VideoStream_Ready != True):
 							break
-							
-				except PiCameraValueError as e:
-					print(e)
-					self.SendError("Stream Error.. Try Again!")	
-							
-				except PiCameraRuntimeError as e:
-					print(e)
-					self.SendError("Stream Error.. Try Again!")	
-					self.VideoStream_Ready = True
-			
-			if(self.exitProgram == True):
-				self.exitProgram = False
-				break
-            
-			time.sleep(0.02)
             
         #Emits the estring to console log GUI
 	def Video_Streaming(self,stream_str):

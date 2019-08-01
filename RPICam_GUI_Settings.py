@@ -34,7 +34,7 @@ class WebStream_Button(QPushButton):         #WebStream button
             self.setStyleSheet(GUI_Style.webButtonOn)   # Button turns red for activated
             self.Web_Stream.setStart(True)
             self.setText("Streaming")
-            self.WriteToConsole("Web Stream URL: 69.4.154.148:7227")  
+            self.WriteToConsole("Web Stream URL: 68.4.154.148:7227")  
             self.AmIStreaming  = True
             
         elif self.AmIStreaming != False:

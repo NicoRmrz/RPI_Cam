@@ -62,7 +62,8 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                     self.wfile.write(b'\r\n')
                     
                     #To annotate timestamp to stream
-                    camera.annotate_text = ("Nico's RPI Cam\n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    ts = datetime.datetime.now().strftime("%d %B %Y %I:%M:%S%p")
+                    camera.annotate_text = ("RPI Cam: " + ts)
 
                     # To add current clients tp webpage
                     host, port = self.client_address
@@ -186,17 +187,12 @@ class WebStream_Thread(QThread):
 
                     address = ('', Port_Number)
                     server = StreamingServer(address, StreamingHandler)
-                    #~ print('Starting server, use <Ctrl-C> to stop')
                     self.Stream_Out('Starting server, use <Ctrl-C> to stop')
                               
                     server.serve_forever()
                     
                 except PiCameraAlreadyRecording as e: 
                     self.Stream_Out(str(e))
-                    #self.Server_Ready = False
-                    #~ self.setStop(True)
-                    #~ sleep (1)
-                    #~ self.setStart(True)
                     
             if(self.exitProgram == True):
                 self.exitProgram = False

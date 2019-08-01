@@ -1,7 +1,10 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject
 from time import sleep
 import os
+from GUI_Stylesheets import GUI_Stylesheets
 
+# Instantiate style sheets for GUI Objects
+GUI_Style = GUI_Stylesheets()
 
 # Icon Image locations
 Main_path = os.getcwd() + "/"     
