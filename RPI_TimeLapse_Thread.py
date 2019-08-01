@@ -15,6 +15,9 @@ Video_Path = Main_path + "Videos/"
 TimeLapse_Path = Main_path + "Time_Lapse/"
 WAIT_BETWEEN_CAPTURE = 5
 
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- TimeLapse Thread Class -----------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------   
 class QRPITimeLapseThread(QThread):
 
 	Time_Lapse_Signal = pyqtSignal(str)
@@ -143,15 +146,12 @@ class QRPITimeLapseThread(QThread):
 												self.TimeLapse_Ready = False 
 												
 												self.Stop_Rec = False
-												#camera.stop_preview()
 												break
 												
 							except PiCameraValueError:
 								self.SendError("Something went wrong with the camera.. Try Again!")
 								self.ButonResethandler("TimeLapse")
-							
-										
-											
+																												
 					if (self.Stop_Rec != False):
 							self.reset_Stream()
 							self.Record_Ready = False
@@ -167,8 +167,7 @@ class QRPITimeLapseThread(QThread):
 							break
 
 					sleep(1)
-			
-			
+						
 	#Emits Time Lapse Image to GUI QLabel
 	def TimeLapse_to_GUI(self, tlapse_str):
 			self.Time_Lapse_Signal.emit(tlapse_str)

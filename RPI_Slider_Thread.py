@@ -1,7 +1,9 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 from time import sleep
 
-
+# --------------------------------------------------------------------------------------------------------------
+# ----------------- Brightness, Contrast, Saturation, Sharpness, Annotation Thread Class -----------------------
+# --------------------------------------------------------------------------------------------------------------   
 class QSliderThread(QThread):
 
     brightnessLabel_Sig = pyqtSignal(int)
@@ -10,8 +12,7 @@ class QSliderThread(QThread):
     saturationLabel_Sig = pyqtSignal(int)
     annotationLabel_Sig = pyqtSignal(int)
     framerate_Sig = pyqtSignal(int)
-    
-    
+        
     def __init__(self, RPICamera):
         QThread.__init__(self)
         self.camera = RPICamera

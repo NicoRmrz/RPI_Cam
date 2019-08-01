@@ -13,7 +13,9 @@ Main_path = os.getcwd() + "/"
 Image_Path = Main_path + "Snapshots/"
 Video_Path = Main_path + "Videos/"
 
-        
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Record Video Thread Class --------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------       
 class QRPIRecordVideoThread(QThread):
 	Recording_Completed_signal = pyqtSignal(str)
 	Recording_Terminated_signal = pyqtSignal(str)
@@ -150,9 +152,7 @@ class QRPIRecordVideoThread(QThread):
 										if (self.TimeLapse_Ready != False):
 												self.ButonResethandler("TimeLapse")
 												self.TimeLapse_Ready = False
-		   
-								
-																
+		   						
 							except PiCameraValueError as e:
 								self.SendError("Something went wrong with the camera.. Try Again!")
 								self.ButonResethandler("Record")
@@ -214,7 +214,9 @@ class QRPIRecordVideoThread(QThread):
 	# Emits error message to console log
 	def SendError(self, string):
 			self.Error_Signal.emit(string)
-                
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Progress Bar Thread Class --------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------                   
 class QPBarThread(QThread):
 	Update_prog_bar_signal = pyqtSignal(int)
 	Btn_Handler = pyqtSignal(str)    

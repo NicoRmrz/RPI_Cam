@@ -1,5 +1,8 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
 
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- GUI setStylesheet Class ----------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class GUI_Stylesheets(QObject):
 	
 	 # Initializes the necessary objects into the slider class for control
@@ -99,7 +102,7 @@ class GUI_Stylesheets(QObject):
 							)			
 		
 		self.videoStream = 	("background-color: qlineargradient(spread:pad x1:0.45, y1:0.3695, x2:0.427, y2:0, "
-								"stop:0 rgba(242, 242, 242, 100), "
+								"stop:0 rgba(0, 0, 0, 100), "
 								"stop:1 rgba(242,242,242,100))"
 							)
 		
@@ -488,7 +491,7 @@ class GUI_Stylesheets(QObject):
 								"padding: 1px 18px 1px 3px; "
 								"min-width: 6em; } "  
 							    
-							"QComboBox:editable {background: white;} "
+							"QComboBox:editable {background: lightgrey;} "
 							
 							"QComboBox:!editable, "
 							"QComboBox::drop-down:editable {font: 15px; "
@@ -533,3 +536,8 @@ class GUI_Stylesheets(QObject):
 							)
 
 		self.mouseTrackPad = ("background-color: pink")
+		
+		self.checkBox = ("color: black; ")
+
+		self.NM_checkBox = ("color: white; ")
+

@@ -16,6 +16,9 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 Main_path = os.getcwd() + "/"
 Image_Path = Main_path + "Snapshots/"
                 
+# --------------------------------------------------------------------------------------------------------------
+# ----------------------------------- VIdeo Stream Thread Class ------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------   
 class QRPIVideoStreamThread(QThread):
 	Video_Stream_signal = pyqtSignal(np.ndarray)
 	Error_Signal = pyqtSignal(str) 
@@ -52,7 +55,6 @@ class QRPIVideoStreamThread(QThread):
 					# If motion detection is checked 
 					self.motionDetection()
 					
-							
 				except PiCameraValueError as e:
 					print(e)
 					self.SendError("Stream Error.. Try Again!")	

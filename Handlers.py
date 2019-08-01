@@ -1,4 +1,6 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtGui import QPixmap, QIcon, QFont, QTextCursor, QPalette, QImage, QBrush, QImage
+
 from time import sleep
 import os
 from GUI_Stylesheets import GUI_Stylesheets
@@ -25,11 +27,19 @@ Left_Button_Path = Main_path + 'Icon_Image/leftButton.png'
 Right_Button_Path = Main_path + 'Icon_Image/rightButton.png'
 Up_Button_Path = Main_path + 'Icon_Image/upButton.png'
 Down_Button_Path = Main_path + 'Icon_Image/downButton.png'
+Left_Button_Pressed_Path = Main_path + 'Icon_Image/leftButton_Pressed.png'
+Right_Button_Pressed_Path = Main_path + 'Icon_Image/rightButton_Pressed.png'
+Up_Button_Pressed_Path = Main_path + 'Icon_Image/upButton_Pressed.png'
+Down_Button_Pressed_Path = Main_path + 'Icon_Image/downButton_Pressed.png'
 Freelook_Path = Main_path + 'Icon_Image/freelook1.png'
 
-# Class to reset button icons
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------------ Button Reset Handler Class ----------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
 class Button_Reset_Handler(QObject):
-        def __init__(self, captureThre, recordThre, timelapseThre, PBarThre, capture, record, timelapse, PBar, vidSteam, servoHThre, servoVThre, statusBar, xPosStausbar, yPosStausbar):
+        def __init__(self, captureThre, recordThre, timelapseThre, PBarThre, capture, record, 
+                                timelapse, PBar, vidSteam, servoHThre, servoVThre, statusBar, 
+                                xPosStausbar, yPosStausbar, leftBtn, rightBtn, upBtn, downBtn):
                 super(Button_Reset_Handler, self).__init__()
                 self.captureThread = captureThre
                 self.recordThread = recordThre
@@ -45,6 +55,10 @@ class Button_Reset_Handler(QObject):
                 self.xPos = xPosStausbar
                 self.yPos = yPosStausbar
                 self.statusBar = statusBar
+                self.leftBtn = leftBtn
+                self.rightBtn = rightBtn
+                self.upBtn = upBtn
+                self.downBtn = downBtn
                 
                 # Connect signals to handler function
                 self.recordThread.Btn_Handler.connect(self.Button_Handler)
@@ -76,20 +90,16 @@ class Button_Reset_Handler(QObject):
                         self.Video_Stream.Set_Video_Stream_Ready(True)          
                         
                 elif self.RstBtn == "Left":
-                        pass
-                        #~ print ("Left done")         
+                        self.leftBtn.setIcon(QIcon(Left_Button_Path))  
                         
                 elif self.RstBtn == "Right":
-                        pass
-                        #~ print ("Right done")           
+                        self.rightBtn.setIcon(QIcon(Right_Button_Path))  
                         
                 elif self.RstBtn == "Up":
-                        pass
-                        #~ print ("Up done")           
+                        self.upBtn.setIcon(QIcon(Up_Button_Path))  
                         
                 elif self.RstBtn == "Down":
-                        pass
-                        #~ print ("Down done")           
+                        self.downBtn.setIcon(QIcon(Down_Button_Path))  
                         
         # To put servo value to status bar 
         def servo_Handler(self, string, value):
@@ -113,8 +123,9 @@ class Button_Reset_Handler(QObject):
                                 newVal = 180 - int(value)
                                 self.yPos.setText("| Y: " + str(newVal))
 
-        
-# Class to display error messages
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------------ Error Handler Class -----------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
 class Error_Handler(QObject):
         def __init__(self, consoleLog, captureThre, recordThre, timelapseThre, videoStreamThre, dropDownThre, webStreamThre, statusBar):
                 super(Error_Handler, self).__init__()

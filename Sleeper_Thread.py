@@ -1,7 +1,9 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 from time import sleep
 
-
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Timer Thread Class ---------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------   
 class QTimeThread(QThread):
 
     time_signal = pyqtSignal(int)
@@ -79,7 +81,6 @@ class QTimeThread(QThread):
                 break
 
             sleep(1)
-
             
     def Time_finished(self, time_in):
         self.time_signal.emit(time_in)

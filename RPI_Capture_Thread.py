@@ -12,6 +12,9 @@ import ntpath
 Main_path = os.getcwd() + "/"
 Image_Path = Main_path + "Snapshots/"
 
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Capture Image Thread Class -------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------   
 class QRPICaptureThread(QThread):
 	Snap_Captured_signal = pyqtSignal(str)
 	Send_Image_signal = pyqtSignal(str)

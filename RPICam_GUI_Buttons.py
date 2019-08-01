@@ -28,8 +28,10 @@ Main_Tab_Path = Main_path + 'Icon_Image/mainTab.png'
 Settings_Tab_Path = Main_path + 'Icon_Image/settingsTab.png'
 
 #GUI Classes
-#This is the class for push buttons from the Pyqt 5 framework
-class Snapshot_Button(QPushButton):         #Capture image button
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Snapshot QPushButton Class -------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
+class Snapshot_Button(QPushButton):        
     old_window = None
     new_window = None
 
@@ -110,8 +112,10 @@ class Snapshot_Button(QPushButton):         #Capture image button
         self.new_window = self.old_window + '\n' + new_input
         self.large_textbox.setText(self.new_window)
         self.large_textbox.moveCursor(QTextCursor.End)
-
-class Record_Button(QPushButton):       #Record Button
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Record QPushButton Class ---------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
+class Record_Button(QPushButton):      
     old_window = None
     new_window = None
 
@@ -196,8 +200,10 @@ class Record_Button(QPushButton):       #Record Button
         self.new_window = self.old_window + '\n' + new_input
         self.large_textbox.setText(self.new_window)
         self.large_textbox.moveCursor(QTextCursor.End)
-        
-class TimeLapse_Button(QPushButton):    #TimeLapse Button
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- TimeLapse QPushButton Class ------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------        
+class TimeLapse_Button(QPushButton):    
     old_window = None
     new_window = None
 
@@ -274,8 +280,10 @@ class TimeLapse_Button(QPushButton):    #TimeLapse Button
         self.new_window = self.old_window + '\n' + new_input
         self.large_textbox.setText(self.new_window)
         self.large_textbox.moveCursor(QTextCursor.End)      
-
-class Stop_Button(QPushButton):         #Stop Button
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- STOP QPushButton Class -----------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
+class Stop_Button(QPushButton):        
 	old_window = None
 	new_window = None
 
@@ -319,8 +327,10 @@ class Stop_Button(QPushButton):         #Stop Button
 		#Turn button color back to normal
 		self.setIcon(QIcon(Stop_Idle_Path))
 		self.RecordBtn.setIcon(QIcon(Video_Idle_Path))
-
-class Logo_Button(QPushButton):         # Secret Logobutton
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Secret/ Logo QPushButton Class ---------------------------------------------
+# --------------------------------------------------------------------------------------------------------------
+class Logo_Button(QPushButton):     
     old_window = None
     new_window = None
     NIGHT_MODE = False

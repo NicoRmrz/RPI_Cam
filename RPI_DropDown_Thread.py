@@ -2,7 +2,9 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 from picamera.exc import PiCameraValueError, PiCameraMMALError
 from time import sleep
 
-
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------- Image Effect, Exposure Mode, and Resolution Thread Class ---------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class QDropDownThread(QThread):
 
 	imgEffect_Sig = pyqtSignal(str)
@@ -63,52 +65,52 @@ class QDropDownThread(QThread):
           
 			#set for change in resolution and framerate mode
 			if (self.resFrmReady != False):
-				if self.resFrmSel =="1640x1232 @ 30 fps":
-					try:
-						self.camera.resolution = (1640, 1232)
-						self.camera.framerate = 30 
-						self.camera.annotate_text_size = 45
+				#~ if self.resFrmSel =="1640x1232 @ 30 fps":
+					#~ try:
+						#~ self.camera.resolution = (1640, 1232)
+						#~ self.camera.framerate = 30 
+						#~ self.camera.annotate_text_size = 45
 
 						
-						#To emit done with selection
-						self.changeResolutionFramerate("1640x1232", "30")
+						#~ #To emit done with selection
+						#~ self.changeResolutionFramerate("1640x1232", "30")
 						
-					except PiCameraMMALError as e:
-						self.SendError("Something went wrong.. MMALError")
-						self.resetAllStreams("Reset")
-						print(e)			
+					#~ except PiCameraMMALError as e:
+						#~ self.SendError("Something went wrong.. MMALError")
+						#~ self.resetAllStreams("Reset")
+						#~ print(e)			
 								
-					finally:
-						# Exit Loop
-						self.resFrmReady = False
+					#~ finally:
+						#~ # Exit Loop
+						#~ self.resFrmReady = False
 					
-				elif  self.resFrmSel == "1640x922 @ 30 fps":
-					try:
-						self.camera.resolution = (1640, 922)
-						self.camera.framerate = 30 
-						self.camera.annotate_text_size = 40
+				#~ elif  self.resFrmSel == "1640x922 @ 30 fps":
+					#~ try:
+						#~ self.camera.resolution = (1640, 922)
+						#~ self.camera.framerate = 30 
+						#~ self.camera.annotate_text_size = 40
 
 						
-						#To emit done with selection
-						self.changeResolutionFramerate("1640x922", "30")
+						#~ #To emit done with selection
+						#~ self.changeResolutionFramerate("1640x922", "30")
 						
-					except PiCameraMMALError as e:
-						self.SendError("Something went wrong.. MMALError")
-						self.resetAllStreams("Reset")
-						print(e)			
+					#~ except PiCameraMMALError as e:
+						#~ self.SendError("Something went wrong.. MMALError")
+						#~ self.resetAllStreams("Reset")
+						#~ print(e)			
 								
-					finally:
-						# Exit Loop
-						self.resFrmReady = False
+					#~ finally:
+						#~ # Exit Loop
+						#~ self.resFrmReady = False
 					
-				elif  self.resFrmSel == "1280x720 @ 40 fps":
+				if  self.resFrmSel == "1280x720 @ 60 fps":
 					try:
 						self.camera.resolution = (1280, 720)
-						self.camera.framerate = 40 
-						self.camera.annotate_text_size = 30
+						#self.camera.framerate = 40 
+						self.camera.annotate_text_size = 28
 						
 						#To emit done with selection
-						self.changeResolutionFramerate("1280x720", "40")
+						self.changeResolutionFramerate("1280x720", "60")
 						
 					except PiCameraMMALError as e:
 						self.SendError("Something went wrong.. MMALError")
@@ -122,7 +124,7 @@ class QDropDownThread(QThread):
 				elif  self.resFrmSel == "640x480 @ 60 fps":
 					try:
 						self.camera.resolution = (640, 480)
-						self.camera.framerate = 60 
+						#self.camera.framerate = 60 
 						self.camera.annotate_text_size = 16
 						
 						#To emit done with selection

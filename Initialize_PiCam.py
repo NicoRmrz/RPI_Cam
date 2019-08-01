@@ -2,7 +2,9 @@ from picamera import PiCamera, Color
 from picamera.array import PiRGBArray
 from time import sleep
 
-
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------- Raspberry Pi Camera Setup Class ----------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class Setup_PiCam(object):
         def __init__(self):
                 self.camera = None

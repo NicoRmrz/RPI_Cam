@@ -15,7 +15,10 @@ client_list = []         # List of connected users
 # PAGE =  index.html 
 with open('index.html', 'r') as f:
     PAGE = f.read()
-    
+ 
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------ Streaming Output object Class -------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------     
 class StreamingOutput(object):
     def __init__(self):
         self.frame = None
@@ -32,7 +35,9 @@ class StreamingOutput(object):
                 self.condition.notify_all()
             self.buffer.seek(0)
         return self.buffer.write(buf)
-
+# --------------------------------------------------------------------------------------------------------------
+# -------------------------------- Web Stream Handler Class ----------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class StreamingHandler(server.BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/':
@@ -120,12 +125,16 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         self.send_header('Content-Length', len(content))
         self.end_headers()
         self.wfile.write(content)
-
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Server Stream Class --------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
     #socketserver.ThreadingMixIn.server_close()
-
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Web Stream Thread Class ----------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class WebStream_Thread(QThread):
     Web_Stream_signal = pyqtSignal(str)
     
@@ -136,7 +145,7 @@ class WebStream_Thread(QThread):
         camera = self.camera
         self.exitProgram = False
         self.Server_Ready = False
-        self.Stop_Ready = False
+        self.Stop_Ready = True
         self.Start_Ready = False
         
     #Sets up the program to exit when the main window is shutting down
@@ -173,7 +182,6 @@ class WebStream_Thread(QThread):
             finally:
                 self.Start_Ready = False
                     
-    
     #Functions runs from .start()
     def run(self):
         self.setPriority(QThread.HighestPriority)

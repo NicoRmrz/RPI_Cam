@@ -28,7 +28,7 @@ from GUI_Stylesheets import GUI_Stylesheets
 from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
-appVersion = "2.2"      # Update version
+appVersion = "2.3"      # Update version
 
 #Initial postion of servos
 horizontal_pos = 90
@@ -72,7 +72,9 @@ if not os.path.exists(TimeLapse_Path):
 # Instantiate style sheets for GUI Objects
 GUI_Style = GUI_Stylesheets()
 
-# This will create the main window on the screen
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Main Window Class ----------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------   
 class Window(QMainWindow):
     
     # Initialization of the GUI
@@ -83,6 +85,9 @@ class Window(QMainWindow):
         self.setStyleSheet(GUI_Style.NM_mainWindow)
         self.setWindowIcon(QIcon(Icon_Path))
         
+        # --------------------------------------------------------------
+        # -------------------- Initialize  -----------------------------
+        # --------------------------------------------------------------  
         # Initialize Pi Camera for all threads
         PiCam = Setup_PiCam()
         self.camera, self.rawCapture = PiCam.PiCam_Configuration() 
@@ -96,7 +101,9 @@ class Window(QMainWindow):
         self.leftRightMotor.angle = horizontal_pos
         self.upDownMotor.angle = vertical_pos
 
-        # Create Threads
+        # --------------------------------------------------------------
+        # ---------------- Instantiate All Threads  --------------------
+        # -------------------------------------------------------------- 
         self.RPICaptureThread = QRPICaptureThread(self.camera)
         self.RPIRecordThread = QRPIRecordVideoThread(self.camera)
         self.RPITimeLapseThread = QRPITimeLapseThread(self.camera)
@@ -110,7 +117,9 @@ class Window(QMainWindow):
         self.leftRightServoThread = QServoHorizontalThread(PiServo, horizontal_pos, vertical_pos)
         self.upDownServoThread = QServoVerticalThread(PiServo, horizontal_pos, vertical_pos)
         
-        # Start run() function on threads
+        # --------------------------------------------------------------
+        # ---------------- Start All Threads ---------------------------
+        # -------------------------------------------------------------- 
         self.RPICaptureThread.start()
         self.RPIRecordThread.start()
         self.RPITimeLapseThread.start()
@@ -124,21 +133,20 @@ class Window(QMainWindow):
         self.leftRightServoThread.start()
         self.upDownServoThread.start()
     
-        # Start Web server at start up
-        self.Web_Stream.StartStreaming(True)
-        self.Web_Stream.setStop(True)
-        self.Web_Stream.setStart(False)
-
-
-        # This builds the main widget for the GUI window to hold
+        # --------------------------------------------------------------
+        # ---------------- Create Main Widget --------------------------
+        # -------------------------------------------------------------- 
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
         
-        # Create Tabs
+        # --------------------------------------------------------------
+        # ---------------- Create Tabs ---------------------------------
+        # -------------------------------------------------------------- 
         self.MyTabs = QTabWidget()
         self.MyTabs.setStyleSheet(GUI_Style.tabs)
         self.MyTabs.setMaximumWidth(400)
         
+        # Create each individual tabs
         self.MainTab = QWidget()
         self.SettingsTab = QWidget()
         self.ServoFreelookTab = QWidget()
@@ -152,11 +160,15 @@ class Window(QMainWindow):
         self.MyTabs.addTab(self.SettingsTab,QIcon(Settings_Tab_Path), '')   
         self.MyTabs.setIconSize(QSize(30, 40))
         
-        '''Status Bar'''
-        # Create bottom Status Bar
+        # --------------------------------------------------------------
+        # -------------- Create Bottom Status Bar-----------------------
+        # -------------------------------------------------------------- 
         self.StatusBar()
         self.setStatusBar(self.statusBar)
         
+        # --------------------------------------------------------------
+        # ------------- Create Main Window Layout ----------------------
+        # --------------------------------------------------------------
         # Create Main window layout to hold tabs and GUI objects
         Main_Window_HLayout = QHBoxLayout()  
         Main_Title_Layout   = QHBoxLayout()  
@@ -164,7 +176,6 @@ class Window(QMainWindow):
         
         # Instantiate Window objects
         self.VideoStream()
-        #~ self.Progress_Bar()
         self.MessageWindowTextBox()
         self.MainLogoButton()
         self.MainTitle()
@@ -178,7 +189,6 @@ class Window(QMainWindow):
         Main_Window_VLayout.addLayout(Main_Title_Layout)
         Main_Window_VLayout.addWidget(self.MyTabs) 
         Main_Window_VLayout.addWidget(self.LargeTextBox)
-        #~ Main_Window_VLayout.addWidget(self.PBar)
         Main_Window_VLayout.setSpacing(20)
         
         # Add tabs and video stream to main window layout
@@ -187,7 +197,9 @@ class Window(QMainWindow):
         Main_Window_HLayout.setSpacing(20)     
         Main_Window_HLayout.setContentsMargins(20, 20, 20, 20)    
                 
-        ''' Home Tab '''
+        # --------------------------------------------------------------
+        # ------------- Create Home Tab --------------------------------
+        # --------------------------------------------------------------
         # Instantiate Home GUI Objects
         self.Snapshot_Btn_GUI()
         self.Progress_Bar()
@@ -211,7 +223,9 @@ class Window(QMainWindow):
         # Add home vertical layout to main tab layout
         self.MainTab.setLayout(vertical_button_layout)
     
-        '''Freelook Tab'''
+        # --------------------------------------------------------------
+        # ------------- Create Free Movement Tab -----------------------
+        # --------------------------------------------------------------
         # Instantiate Servo GUI Objects 
         self.mouseTracker()
         
@@ -222,7 +236,9 @@ class Window(QMainWindow):
         # Add layout to frelook tab 
         self.ServoFreelookTab.setLayout(vertical_servo_layout)
     
-        '''Servo Controller Tab'''
+        # --------------------------------------------------------------
+        # ---------- Create Servo Arrow Movement Tab -------------------
+        # --------------------------------------------------------------
         # Instantiate control buttons for Servo Controller Tab
         self.leftButton()
         self.rightButton()
@@ -249,8 +265,9 @@ class Window(QMainWindow):
         # Add servo control layout to servo tab 
         self.ServoControllerTab.setLayout(vertical_servoCtrl_layout)
 
-        
-        ''' Settings Tab '''
+        # --------------------------------------------------------------
+        # ------------- Create Settings Tab ----------------------------
+        # --------------------------------------------------------------
         # Instantiate Settings GUI Objects    
         self.webStream_Btn_GUI()    
         self.brightnessLabel()
@@ -353,23 +370,34 @@ class Window(QMainWindow):
         # Add vertical layout to settings tab layout
         self.SettingsTab.setLayout(vertical_settings_layout)    
 
-        # Instantiate button reset handler and error handler
-        self.allHandlers()
-
-        '''Add all tabs to GUI'''
+        # --------------------------------------------------------------
+        # ------------ Add Final Layout to Main Window -----------------
+        # -------------------------------------------------------------- 
         # Set Main window layout to GUI central Widget
         self.centralWidget().setLayout(Main_Window_HLayout)
         self.centralWidget().isWindow()
         
+        # --------------------------------------------------------------
+        # --------------- Initialize Start Up Services -----------------
+        # -------------------------------------------------------------- 
         # start streaming video on start up
         self.Video_Stream.Set_Video_Stream_Ready(True)
         self.Logo_btn.Un_Click()
         
+        # Init Web server at start up
+        self.Web_Stream.StartStreaming(True)
+        self.Web_Stream.setStop(True)
+        self.Web_Stream.setStart(False)
+        
+        # Instantiate button reset handler and error handler
+        self.allHandlers()
+        
         # Display GUI Objects
         self.show()
         
-        
-# Function for camera servo controls via keyboard keys
+    # ------------------------------------------------------------------
+    # ------ Function for camera servo controls via keyboard keys ------
+    # ------------------------------------------------------------------
     def keyPressEvent(self, event):
         key = event.key()
  
@@ -385,7 +413,9 @@ class Window(QMainWindow):
         elif key == Qt.Key_D:   # Move Right
                 self.right_btn.On_Click()        
         
-    ''' Main Window GUI Objects'''
+# --------------------------------------------------------------------------------------------------------------
+# -------------------------------- GUI Object Functions --------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------  
     # Create Main Title Text
     def MainTitle(self):
         self.UpperText = QLabel(self)
@@ -420,16 +450,9 @@ class Window(QMainWindow):
         self.LargeTextBox.setLineWrapMode(True)
         self.LargeTextBox.setAlignment(Qt.AlignTop)
 
-    # Create Progress Bar
-    def Progress_Bar(self):
-        self.PBar = QProgressBar(self)
-        self.PBar.setGeometry(75,600,250,25)
-        self.PBar.setStyleSheet(GUI_Style.progressBar)
-        self.PBar.setTextVisible(True)
-        self.PBar.setAlignment(Qt.AlignCenter)
-        
-        '''Status Bar Objects'''
-        # Create Status Bar
+    # ------------------------------------------------------------------
+    # ---------------- Create Status Bar Function ----------------------
+    # ------------------------------------------------------------------
     def StatusBar(self):
         self.statusBar = QStatusBar()
         self.statusBar.setStyleSheet(GUI_Style.statusBarWhite)
@@ -458,7 +481,9 @@ class Window(QMainWindow):
         
         self.statusBar.showMessage("Starting Up... ", 4000)
         
-    ''' Home Tab GUI Objects'''
+    # ------------------------------------------------------------------
+    # ------------ Home Tab GUI Objects Functions ----------------------
+    # ------------------------------------------------------------------
     # Creating button for snapshots
     def Snapshot_Btn_GUI(self):
         self.snpsht_btn = Snapshot_Button(self, "", self.LargeTextBox, self.RPICaptureThread, self.Video_Stream, self.Timer_Thread, self.RPIRecordThread, self.RPITimeLapseThread)
@@ -495,17 +520,29 @@ class Window(QMainWindow):
         self.stp_rec_btn.setIcon(QIcon(Stop_Idle_Path))
         self.stp_rec_btn.setIconSize(QSize(60, 60))
 
-    '''Handler classes'''
+    # Create Progress Bar
+    def Progress_Bar(self):
+        self.PBar = QProgressBar(self)
+        self.PBar.setGeometry(75,600,250,25)
+        self.PBar.setStyleSheet(GUI_Style.progressBar)
+        self.PBar.setTextVisible(True)
+        self.PBar.setAlignment(Qt.AlignCenter)
+
+    # ------------------------------------------------------------------
+    # ------------ Handler Insantiation Function -----------------------
+    # ------------------------------------------------------------------
     # Instantiate button handler object class
     def allHandlers(self):
         self.buttonHandler = Button_Reset_Handler(self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, self.PBarThread, 
                                                         self.snpsht_btn, self.rec_btn, self.Time_Lapse_btn,self.PBar, self.Video_Stream, 
                                                         self.leftRightServoThread, self.upDownServoThread , self.statusBar, self.xHorizontal, 
-                                                        self.yVertical)
+                                                        self.yVertical, self.left_btn, self.right_btn, self.up_btn, self.down_btn)
         self.errorHandler = Error_Handler(self.LargeTextBox, self.RPICaptureThread, self.RPIRecordThread, self.RPITimeLapseThread, 
                                                         self.Video_Stream, self.dropdownThread, self.Web_Stream, self.statusBar)
 
-    ''' Settings Tab GUI Objects'''
+    # ------------------------------------------------------------------
+    # ----------- Settings Tab GUI Objects Functions -------------------
+    # ------------------------------------------------------------------
     # Start web stream button
     def webStream_Btn_GUI(self):
         self.webStream_Btn = WebStream_Button(self, "Start Web Stream", self.LargeTextBox, self.Web_Stream)
@@ -625,8 +662,8 @@ class Window(QMainWindow):
         self.annotationSldr.setStyleSheet(GUI_Style.annotationSlider)
         self.annotationSldr.setFocusPolicy(Qt.NoFocus)
         self.annotationSldr.setRange(6, 160)
-        self.annotationSldr.setValue(30)
-        self.camera.annotate_text_size = 30
+        self.annotationSldr.setValue(28)
+        self.camera.annotate_text_size = 28
         self.annotationSldr.valueChanged[int].connect(self.annotationSldr.changeValue)
         
     # Image Effect text/ logo
@@ -698,18 +735,28 @@ class Window(QMainWindow):
     # To create a drop down for Exposure Mode
     def resolutionFramerate_DrpDwn(self):
         self.resFrmrtDrpDwn = Resolution_Framerate_DropDown(self, self.LargeTextBox, self.dropdownThread, self.Video_Stream, self.Web_Stream, self.Timer_Thread, self.res)
-        self.resFrmrtDrpDwn.addItem("1640x1232 @ 30 fps")
-        self.resFrmrtDrpDwn.addItem("1640x922 @ 30 fps")
-        self.resFrmrtDrpDwn.addItem("1280x720 @ 40 fps")
+        #~ self.resFrmrtDrpDwn.addItem("1640x1232 @ 30 fps")
+        #~ self.resFrmrtDrpDwn.addItem("1640x922 @ 30 fps")
+        self.resFrmrtDrpDwn.addItem("1280x720 @ 60 fps")
         self.resFrmrtDrpDwn.addItem("640x480 @ 60 fps")
-        self.resFrmrtDrpDwn.setCurrentIndex(2)
+        self.resFrmrtDrpDwn.setCurrentIndex(0)
 
         self.resFrmrtDrpDwn.setStyleSheet(GUI_Style.resolutionFramerate)   
         self.camera.resolution = (1280, 720)
-        self.camera.framerate = 60 
+        self.camera.framerate = 60
         self.resFrmrtDrpDwn.activated[str].connect(self.resFrmrtDrpDwn.resolutionFramerate_Selection)
-   
-        '''Freelook tab GUI Objects'''   
+        
+   # Check box for load type selection
+    def motionDetToggle(self):
+        self.motionDetCheckBox = motionDetectionCheckBox(self, "Motion Detection")
+        self.motionDetCheckBox.setStyleSheet(GUI_Style.checkBox)
+        self.motionDetCheckBox.setMaximumSize(150, 25)
+        #self.motionDetCheckBox.toggle()
+        self.motionDetCheckBox.stateChanged.connect(self.motionDetCheckBox.configLoad)
+
+    # ------------------------------------------------------------------
+    # --------- Free Movement Tab GUI Objects Functions ----------------
+    # ------------------------------------------------------------------  
     # To create a mouse pad for camera freelook
     def mouseTracker(self):
         self.mouseTracker = MouseTracker(self, self.leftRightServoThread, self.upDownServoThread)
@@ -717,12 +764,14 @@ class Window(QMainWindow):
         self.mouseTracker.setStyleSheet(GUI_Style.mouseTrackPad)
         self.mouseTracker.setMouseTracking(True)
    
-        '''Servo Controller tab GUI Objects'''   
+    # ------------------------------------------------------------------
+    # --------- Servo Controller Tab GUI Objects Functions -------------
+    # ------------------------------------------------------------------
     # To create button for left click events
     def leftButton(self):
         self.left_btn = Left_Button(self, "", self.leftRightServoThread)
         self.left_btn.setStyleSheet(GUI_Style.startButton)
-        self.left_btn.clicked.connect(self.left_btn.On_Click)
+        self.left_btn.pressed.connect(self.left_btn.On_Click)
         self.left_btn.setIcon(QIcon(Left_Button_Path))
         self.left_btn.setIconSize(QSize(65, 70))
         
@@ -730,7 +779,7 @@ class Window(QMainWindow):
     def rightButton(self):
         self.right_btn = Right_Button(self, "", self.leftRightServoThread)
         self.right_btn.setStyleSheet(GUI_Style.startButton)
-        self.right_btn.clicked.connect(self.right_btn.On_Click)
+        self.right_btn.pressed.connect(self.right_btn.On_Click)
         self.right_btn.setIcon(QIcon(Right_Button_Path))
         self.right_btn.setIconSize(QSize(65, 70))
         
@@ -738,7 +787,7 @@ class Window(QMainWindow):
     def upButton(self):
         self.up_btn = Up_Button(self, "", self.upDownServoThread)
         self.up_btn.setStyleSheet(GUI_Style.startButton)
-        self.up_btn.clicked.connect(self.up_btn.On_Click)
+        self.up_btn.pressed.connect(self.up_btn.On_Click)
         self.up_btn.setIcon(QIcon(Up_Button_Path))
         self.up_btn.setIconSize(QSize(65, 70))
         
@@ -746,11 +795,13 @@ class Window(QMainWindow):
     def downButton(self):
         self.down_btn = Down_Button(self, "", self.upDownServoThread)
         self.down_btn.setStyleSheet(GUI_Style.startButton)
-        self.down_btn.clicked.connect(self.down_btn.On_Click)
+        self.down_btn.pressed.connect(self.down_btn.On_Click)
         self.down_btn.setIcon(QIcon(Down_Button_Path))
         self.down_btn.setIconSize(QSize(65, 70))
 
-        
+    # ------------------------------------------------------------------
+    # ----------- Close All Threads at app closure ---------------------
+    # ------------------------------------------------------------------             
     # Stop all threads when GUI is closed
     def closeEvent(self, *args, **kwargs):
         self.RPICaptureThread.Set_Exit_Program(True)
@@ -779,7 +830,9 @@ class Window(QMainWindow):
         self.upDownServoThread.wait(100)
 
 
-#Main loop
+# ----------------------------------------------------------------------
+# -------------------- MAIN LOOP ---------------------------------------
+# ----------------------------------------------------------------------
 def run():
     #Run the application
     app = QApplication(sys.argv)
@@ -818,4 +871,5 @@ if __name__ == "__main__":
 # 1.9 - Create folder path if not created at start up. - May 2, 2019
 # 2.0 - Rewrite stream thread from capture_contnious to capture_sequence, wed stream button fix to start server but disable stream at startup. - July 15, 2019
 # 2.1 - Adding Open CV to pi camera for image processing. Not Complete yet - July 22, 2019
-# 2.2 - Add new .py file for handlers and stream class
+# 2.2 - Add new .py file for handlers and stream class - August 1, 2019
+# 2.3 - Commented all files. Code optimization. Motion Detection on Stream

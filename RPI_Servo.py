@@ -5,6 +5,9 @@ from adafruit_motor import servo
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 from time import sleep
 
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------ I2C Servo Initialization Class ------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class Initialize_Servo(object):
         def __init__(self):
             # Create the I2C bus interface.
@@ -28,7 +31,9 @@ class Initialize_Servo(object):
             # Set range of motion
             self.upDownMotor.actuation_range = 180
             self.leftRightMotor.actuation_range = 180
-
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------ Horizontal Servo Movement Thread Class ----------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class QServoHorizontalThread(QThread):
 
     horizontal_Sig = pyqtSignal(str, str)
@@ -129,8 +134,9 @@ class QServoHorizontalThread(QThread):
         
     def ButtonHandler(self, string):
         self.Btn_Handler.emit(string)
-            
-
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------ Vertical Servo Movement Thread Class ----------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class QServoVerticalThread(QThread):
 
     vertical_Sig = pyqtSignal(str, str)
@@ -225,16 +231,15 @@ class QServoVerticalThread(QThread):
                 break
 
             sleep(0.01)
-
         
     def verticalDone(self, string, value):
         self.vertical_Sig.emit(string, value)
         
     def ButtonHandler(self, string):
         self.Btn_Handler.emit(string)
-            
-    
-
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------ Free Movement Track Pad Thread Class ------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
 class QServoTrackPadThread(QThread):
 
     upDown_Sig = pyqtSignal(int)
@@ -255,8 +260,6 @@ class QServoTrackPadThread(QThread):
         self.upDownMotor = self.PiServo.upDownMotor
         self.leftRightMotor = self.PiServo.leftRightMotor
         self.hat = self.PiServo.hat
-
-        
         
     # Set to update value of Up Down Servo slider
     def set_upDownSlider(self, string, newNum):
@@ -294,8 +297,7 @@ class QServoTrackPadThread(QThread):
                 self.exitProgram = False
                 break
 
-            sleep(0.2)
-
+            sleep(0.1)
 
     def horizontalDone(self, string, value):
         self.horizontal_Sig.emit(string, value)
@@ -306,24 +308,3 @@ class QServoTrackPadThread(QThread):
     def ButtonHandler(self, string):
         self.Btn_Handler.emit(string)
             
-    
-
-        
-   
-
-#~ for i in range(180):
-    #~ upDownMotor.angle = 180-i
-    #~ print (i)
-    #~ sleep (0.5)
-    
-
-# move back and forth horizontal motor
-# 0 - 180/ right to left
-#~ for i in range(180):
-    #~ leftRightMotor.angle = i
-    #~ sleep (0.1)
-    
-#~ for i in range(180):
-    #~ leftRightMotor.angle = 180 - i
-    #~ sleep (0.5)
-

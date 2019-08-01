@@ -1,11 +1,15 @@
+# import pyqt5 gui libraries
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, QLabel
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, QLabel, QSizePolicy
 from PyQt5.QtGui import QPixmap, QIcon, QFont, QTextCursor, QPalette, QImage, QBrush, QImage
+
 from time import sleep
 import os
+import numpy as np
 
-
-# GUI Class to display camera feed on GUI
+# --------------------------------------------------------------------------------------------------------------
+# ----------------------------------- Video Stream QLabel Class ------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------   
 class Stream_Video(QLabel):             
         
     def __init__(self, window, video_stream, Record_Thread, Capture_Thread, TimeLapse_Thread):
@@ -23,10 +27,9 @@ class Stream_Video(QLabel):
         self.timelapseThread.Time_Lapse_Signal.connect(self.TimeLapsetoGUI)
         
     def StreamToGUI(self, input_video):
-        self.video_input = input_video
-        print(input_video)
-        #~ pixmap = QPixmap(self.video_input)
-        #~ self.setPixmap(pixmap)
+        qimage = QImage(input_video, input_video.shape[1], input_video.shape[0], input_video.shape[1] * 3, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap.fromImage(qimage)
+        self.setPixmap(pixmap)
         
     def ImagetoGUI(self, input_pic):
         pixmap = QPixmap(input_pic)

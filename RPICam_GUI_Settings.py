@@ -1,5 +1,5 @@
 import PyQt5
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, QLabel, QCheckBox, QTextEdit, QProgressBar, QSizePolicy, QWidget, QTabWidget, QHBoxLayout, QVBoxLayout, QSlider, QComboBox
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QCheckBox, QLineEdit, QLabel, QCheckBox, QTextEdit, QProgressBar, QSizePolicy, QWidget, QTabWidget, QHBoxLayout, QVBoxLayout, QSlider, QComboBox
 from PyQt5.QtGui import QPixmap, QIcon, QFont, QTextCursor, QPalette, QImage, QBrush
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QObject, QSize
 
@@ -10,8 +10,29 @@ from GUI_Stylesheets import GUI_Stylesheets
 GUI_Style = GUI_Stylesheets()
 
 #GUI Classes
-# Pushbutton class to enable webStream
-class WebStream_Button(QPushButton):         #WebStream button
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------------ OpenCV Selection Check Box Class ----------------------------------------
+# --------------------------------------------------------------------------------------------------------------
+class motionDetectionCheckBox(QCheckBox):
+
+    def __init__(self, window, text):
+        super(LoadCheckBox, self).__init__()
+        self.setText(text)
+        self.setParent(window)
+     
+
+    # Function to change load configurations
+    def configLoad(self, state):
+
+        if state == Qt.Checked:     
+            pass
+
+        else:              
+            pass         
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------------ Web Stream Button Class -------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------         
+class WebStream_Button(QPushButton):        
     def __init__(self, window, text, consoleLog, webThread):
         super(WebStream_Button, self).__init__()
         self.setText(text)
@@ -55,10 +76,10 @@ class WebStream_Button(QPushButton):         #WebStream button
             self.new_window = self.old_window + '\n' + new_input
             self.large_textbox.setText(self.new_window)
             self.large_textbox.moveCursor(QTextCursor.End)
-    
-        
-#This is the class for sliders from the Pyqt 5 framework
-class Brightness_Slider(QSlider):         #Brightness Slider
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------------ Brightness Slider Class -------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------        
+class Brightness_Slider(QSlider):         
 
     # Initializes the necessary objects into the slider class for control
     def __init__(self, window, label, thread):
@@ -77,8 +98,10 @@ class Brightness_Slider(QSlider):         #Brightness Slider
     def updateLabel(self, value):
         self.value = value
         self.currVal.setText(str(self.value))
-        
-class Contrast_Slider(QSlider):         #Contrast Slider
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------------ Contrast Slider Class ---------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------    
+class Contrast_Slider(QSlider):         
 
     # Initializes the necessary objects into the slider class for control
     def __init__(self, window, label, thread):
@@ -97,8 +120,10 @@ class Contrast_Slider(QSlider):         #Contrast Slider
     def updateLabel(self, value):
         self.value = value
         self.currVal.setText(str(self.value))
-        
-class Sharpness_Slider(QSlider):         #Sharpness Slider
+# --------------------------------------------------------------------------------------------------------------
+# ------------------------------------ Sharpness Slider Class --------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
+class Sharpness_Slider(QSlider):         
 
     # Initializes the necessary objects into the slider class for control
     def __init__(self, window, label, thread):
@@ -117,8 +142,10 @@ class Sharpness_Slider(QSlider):         #Sharpness Slider
     def updateLabel(self, value):
         self.value = value
         self.currVal.setText(str(self.value))
-        
-class Saturation_Slider(QSlider):         #Saturation Slider
+# --------------------------------------------------------------------------------------------------------------
+# ----------------------------------- Saturation Slider Class --------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------- 
+class Saturation_Slider(QSlider):        
 
     # Initializes the necessary objects into the slider class for control
     def __init__(self, window, label, thread):
@@ -137,8 +164,10 @@ class Saturation_Slider(QSlider):         #Saturation Slider
     def updateLabel(self, value):
         self.value = value
         self.currVal.setText(str(self.value))
-        
-class Annotation_Slider(QSlider):         #Annotation Slider
+# --------------------------------------------------------------------------------------------------------------
+# ----------------------------------- Annotation Slider Class --------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------        
+class Annotation_Slider(QSlider):        
 
     # Initializes the necessary objects into the slider class for control
     def __init__(self, window, label, thread):
@@ -157,8 +186,10 @@ class Annotation_Slider(QSlider):         #Annotation Slider
     def updateLabel(self, value):
         self.value = value
         self.currVal.setText(str(self.value))
-        
-class Image_Effect_DropDown(QComboBox):         #Image effect drop down box
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Image Effect Drop Down Class -----------------------------------------------
+# --------------------------------------------------------------------------------------------------------------        
+class Image_Effect_DropDown(QComboBox):       
     old_window = None
     new_window = None
     
@@ -188,8 +219,10 @@ class Image_Effect_DropDown(QComboBox):         #Image effect drop down box
         self.new_window = self.old_window + '\n' + new_input
         self.large_textbox.setText(self.new_window)
         self.large_textbox.moveCursor(QTextCursor.End)
-        
-class Exposure_Mode_DropDown(QComboBox):         # Exposure Mode drop down box
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Exposure Mode Drop Down Class ----------------------------------------------
+# --------------------------------------------------------------------------------------------------------------     
+class Exposure_Mode_DropDown(QComboBox):         
     old_window = None
     new_window = None
     
@@ -219,8 +252,10 @@ class Exposure_Mode_DropDown(QComboBox):         # Exposure Mode drop down box
         self.new_window = self.old_window + '\n' + new_input
         self.large_textbox.setText(self.new_window)
         self.large_textbox.moveCursor(QTextCursor.End)
-        
-class Resolution_Framerate_DropDown(QComboBox):         # Resolution/ Framerate drop down box
+# --------------------------------------------------------------------------------------------------------------
+# --------------------------------- Resolution/ Framerate Drop Down Class --------------------------------------
+# --------------------------------------------------------------------------------------------------------------         
+class Resolution_Framerate_DropDown(QComboBox):     
     old_window = None
     new_window = None
     
