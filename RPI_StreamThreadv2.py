@@ -69,7 +69,9 @@ class QRPIVideoStreamThread(QThread):
 				break
             
 			time.sleep(1)
-			
+# ------------------------------------------------------------------			
+# ------------Motion Detection Function ----------------------------
+# ------------------------------------------------------------------			
 	def motionDetection(self):
 		avg = None
 
@@ -78,7 +80,7 @@ class QRPIVideoStreamThread(QThread):
 						# PiCam Stream configuration
 						self.camera.annotate_foreground = Color('black')
 						ts = datetime.datetime.now().strftime("%d %B %Y %I:%M:%S%p")
-						self.camera.annotate_text = ("RPI Cam: " + ts)
+						self.camera.annotate_text = ("RPI Cam: " + ts + "\n Motion {Not Detected}")
 						self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
 					
 						# grab the raw NumPy array representing the image
@@ -119,18 +121,26 @@ class QRPIVideoStreamThread(QThread):
 							# compute the bounding box for the contour, draw it on the frame,
 							(x, y, w, h) = cv2.boundingRect(c)
 							cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-							#text = "Occupied"
-					 
-						# draw the text and timestamp on the frame
-						#~ ts = datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p")
-						#~ cv2.putText(image, "RPI Cam: " + ts, (2, 20), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 0, 0), 2)
+							
+							ts = datetime.datetime.now().strftime("%d %B %Y %I:%M:%S%p")
+							self.camera.annotate_text = ("RPI Cam: " + ts + "\n Motion {Detected}")
+							
+							#Can add code later to record video/ pic/...etc
 
 						#emit frame data captured
 						self.Video_Streaming(image)
 						
 						if (self.VideoStream_Ready != True):
 							break
-            
+# ------------------------------------------------------------------			
+# ------------Face Recognition Function ----------------------------
+# ------------------------------------------------------------------     
+	def faceRecognition(self):
+		pass      
+		
+# ------------------------------------------------------------------			
+# ------------Emit Signals Functions -------------------------------
+# ------------------------------------------------------------------  		
         #Emits the estring to console log GUI
 	def Video_Streaming(self,stream_str):
 		self.Video_Stream_signal.emit(stream_str) 

@@ -189,10 +189,6 @@ class WebStream_Thread(QThread):
         while (1):
             if (self.Server_Ready != False):
                 try:
-                    self.camera.start_recording(output, format='mjpeg', splitter_port = 3)
-                    self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
-                    self.camera.annotate_foreground = Color('black')
-
                     address = ('', Port_Number)
                     server = StreamingServer(address, StreamingHandler)
                     self.Stream_Out('Starting server, use <Ctrl-C> to stop')
