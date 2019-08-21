@@ -26,7 +26,7 @@ from Sleeper_Thread import QTimeThread
 from web_stream import WebStream_Thread
 from GUI_Stylesheets import GUI_Stylesheets
 #from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
-from RPI_ZeroServo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
+from RPI_Servo_Zero import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
 appVersion = "2.3"      # Update version
