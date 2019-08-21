@@ -11,32 +11,14 @@ from time import sleep
 # -------------------------------------------------------------------------------------------------------------- 
 class Initialize_Servo(object):
         def __init__(self):
-            # Create the I2C bus interface.
-            #i2c_bus = busio.I2C(board.SCL, board.SDA)
-            pwm = PCA9685(0x40)
-            
-
             # Create a simple PCA9685 class instance.
-            #self.hat = PCA9685(i2c_bus)
+            self.pwm = PCA9685(0x40)
+            # Set the PWM frequency to 50hz
+            self.pwm.setPWMFreq(50)
 
-            # Set the PWM frequency to 60hz
-           # self.hat.frequency = 60
-            pwm.setPWMFreq(50)
+            self.pwm.setServoPulse(0,1500)
+            self.pwm.setServoPulse(1,1500)
 
-            pwm.setServoPulse(0,1500)
-            pwm.setServoPulse(1,1500)
-            # To select which channel on the driver to control
-           # verticalChannel     = self.hat.channels[0]
-         #   horizontalChannel   = self.hat.channels[1]
-
-            # To select which channel on the driver to control
-            # For Micro servo - TowerPro SG-92R: https://www.adafruit.com/product/169
-          #  self.upDownMotor     = servo.Servo(verticalChannel, min_pulse=500, max_pulse=2400)
-           # self.leftRightMotor  = servo.Servo(horizontalChannel, min_pulse=500, max_pulse=2400)
-
-            # Set range of motion
-           # self.upDownMotor.actuation_range = 180
-            #self.leftRightMotor.actuation_range = 180
 # --------------------------------------------------------------------------------------------------------------
 # ------------------------------ Horizontal Servo Movement Thread Class ----------------------------------------
 # -------------------------------------------------------------------------------------------------------------- 
@@ -45,7 +27,7 @@ class QServoHorizontalThread(QThread):
     horizontal_Sig = pyqtSignal(str, str)
     Btn_Handler = pyqtSignal(str)
     
-    def __init__(self, PiServo, horizontal_pos, vertical_pos):
+    def __init__(self, PiServo, horizontal_pos):
         QThread.__init__(self)
         self.PiServo = PiServo
         self.exitProgram = False
@@ -54,23 +36,23 @@ class QServoHorizontalThread(QThread):
         self.setYPOS = False
         self.horizontalPosition = horizontal_pos
         
-        #self.upDownMotor = self.PiServo.upDownMotor
-        self.leftRightMotor = self.PiServo.pwm
-        #self.hat = self.PiServo.hat
+       # self.upDownMotor = self.PiServo.upDownMotor
+        #self.leftRightMotor = self.PiServo.leftRightMotor
+       # self.hat = self.PiServo.hat
         
     # Set to move camera left
     def set_leftButton(self, string):
         self.left = string
-        if (self.horizontalPosition <= 180): # Set max limit
-            self.horizontalPosition = self.horizontalPosition + 1
+        if (self.horizontalPosition <= 2500): # Set max limit
+            self.horizontalPosition = self.horizontalPosition + 10
         else:
             self.horizontalPosition = self.horizontalPosition
         
     # Set to move camera right
     def set_rightButton(self, string):
         self.right = string
-        if (self.horizontalPosition >= 0): # Set min limit
-            self.horizontalPosition = self.horizontalPosition - 1
+        if (self.horizontalPosition >= 500): # Set min limit
+            self.horizontalPosition = self.horizontalPosition - 10
         else:
             self.horizontalPosition = self.horizontalPosition
                
@@ -88,7 +70,7 @@ class QServoHorizontalThread(QThread):
 
         while(1):
             
-            ## Set Y value of track pad to servo position
+            # Set Y value of track pad to servo position
             #if self.setYPOS != False:
             #    try:
             #        self.leftRightMotor.angle = self.yPosition
@@ -99,14 +81,15 @@ class QServoHorizontalThread(QThread):
             
             #Set for left key "A" to move camera left
             if self.left != False:
-                if (self.horizontalPosition >=0 and self.horizontalPosition <= 180):
-                  #  self.leftRightMotor.angle = self.horizontalPosition
+                if (self.horizontalPosition >=500 and self.horizontalPosition <= 2500):
+                   # self.leftRightMotor.angle = self.horizontalPosition
+                    self.PiServo.pwm.setServoPulse(1,self.horizontalPosition)
                     self.horizontalDone("horizontalMotor", str(self.horizontalPosition))         #Emit new position of servo
                     
-                elif (self.horizontalPosition < 0):
+                elif (self.horizontalPosition < 50):
                     self.horizontalDone("horizontalMotor", "Min")
                     
-                elif (self.horizontalPosition > 180):
+                elif (self.horizontalPosition > 2500):
                     self.horizontalDone("horizontalMotor", "Max")
                     
                 self.ButtonHandler("Left")
@@ -114,14 +97,14 @@ class QServoHorizontalThread(QThread):
                      
             #Set for right key "D" to move camera right
             if self.right != False:
-                if (self.horizontalPosition >=0 and self.horizontalPosition <= 180):
-                  #  self.leftRightMotor.angle = self.horizontalPosition
+                if (self.horizontalPosition >=500 and self.horizontalPosition <= 2500):
+                    self.PiServo.pwm.setServoPulse(1,self.horizontalPosition)
                     self.horizontalDone("horizontalMotor", str(self.horizontalPosition))         #Emit new position of servo
                     
-                elif (self.horizontalPosition < 0):
+                elif (self.horizontalPosition < 50):
                     self.horizontalDone("horizontalMotor", "Min")
                     
-                elif (self.horizontalPosition > 180):
+                elif (self.horizontalPosition > 2500):
                     self.horizontalDone("horizontalMotor", "Max")
                     
                 self.ButtonHandler("Right")
@@ -129,7 +112,7 @@ class QServoHorizontalThread(QThread):
         
                 
             if(self.exitProgram == True):
-                #self.hat.deinit() # To stop using pca9685
+               # self.hat.deinit() # To stop using pca9685
                 self.exitProgram = False
                 break
 
@@ -148,32 +131,32 @@ class QServoVerticalThread(QThread):
     vertical_Sig = pyqtSignal(str, str)
     Btn_Handler = pyqtSignal(str)
     
-    def __init__(self, PiServo, horizontal_pos, vertical_pos):
+    def __init__(self, PiServo, vertical_pos):
         QThread.__init__(self)
         self.PiServo = PiServo
         self.exitProgram = False
         self.up = False
         self.down = False
         self.setXPOS = False
-        self.horizontalPosition = horizontal_pos
         self.verticalPosition = vertical_pos
         
-        self.upDownMotor = self.PiServo.pwm
-        #self.hat = self.PiServo.hat
+        #~ self.upDownMotor = self.PiServo.upDownMotor
+        #~ self.leftRightMotor = self.PiServo.leftRightMotor
+        #~ self.hat = self.PiServo.hat
 
     # Set to move camera up
     def set_upButton(self, string):
         self.up = string
-        if (self.verticalPosition <= 10): # Set min limit
+        if (self.verticalPosition <= 500): # Set min limit
             self.verticalPosition = self.verticalPosition 
         else:
-            self.verticalPosition = self.verticalPosition - 1
+            self.verticalPosition = self.verticalPosition - 10
         
     # Set to move camera down
     def set_downButton(self, string):
         self.down = string
-        if (self.verticalPosition <= 180): # Set max limit
-            self.verticalPosition = self.verticalPosition + 1
+        if (self.verticalPosition <= 2500): # Set max limit
+            self.verticalPosition = self.verticalPosition + 10
         else:
             self.verticalPosition = self.verticalPosition
             
@@ -192,24 +175,24 @@ class QServoVerticalThread(QThread):
         while(1):
             
             # Set Y value of track pad to servo position
-            if self.setXPOS != False:
-                try:
-                    self.upDownMotor.angle = self.xPosition
-                except ValueError as e: 
-                    print(e)
-                finally:
-                    self.setXPOS = False
+            #if self.setXPOS != False:
+            #    try:
+            #        self.upDownMotor.angle = self.xPosition
+            #    except ValueError as e: 
+            #        print(e)
+            #    finally:
+            #        self.setXPOS = False
             
             #Set for left key "W" to move camera up
             if self.up != False:
-                if (self.verticalPosition >10 and self.verticalPosition <= 180):
-                    self.upDownMotor.angle = self.verticalPosition
+                if (self.verticalPosition >50 and self.verticalPosition <= 2500):
+                    self.PiServo.pwm.setServoPulse(0,self.verticalPosition)
                     self.verticalDone("verticalMotor", str(self.verticalPosition))         #Emit new position of servo
                     
-                elif (self.verticalPosition <= 10):
+                elif (self.verticalPosition <= 50):
                     self.verticalDone("verticalMotor", "Min")
                     
-                elif (self.verticalPosition > 180):
+                elif (self.verticalPosition > 2500):
                     self.verticalDone("verticalMotor", "Max")
                     
                 self.ButtonHandler("Up")
@@ -217,14 +200,14 @@ class QServoVerticalThread(QThread):
        
             #Set for left key "S" to move camera down
             if self.down != False:
-                if (self.verticalPosition >10 and self.verticalPosition <= 180):
-                    self.upDownMotor.angle = self.verticalPosition
+                if (self.verticalPosition >50 and self.verticalPosition <= 2500):
+                    self.PiServo.pwm.setServoPulse(0,self.verticalPosition)
                     self.verticalDone("verticalMotor", str(self.verticalPosition))         #Emit new position of servo
                     
-                elif (self.verticalPosition <= 10):
+                elif (self.verticalPosition <= 50):
                     self.verticalDone("verticalMotor", "Min")
                     
-                elif (self.verticalPosition > 180):
+                elif (self.verticalPosition > 2500):
                     self.verticalDone("verticalMotor", "Max")
                     
                 self.ButtonHandler("Down")
@@ -262,9 +245,7 @@ class QServoTrackPadThread(QThread):
         self.horizontalPosition = horizontal_pos
         self.verticalPosition = vertical_pos
         
-        self.upDownMotor = self.PiServo.upDownMotor
-        self.leftRightMotor = self.PiServo.leftRightMotor
-    #    self.hat = self.PiServo.hat
+   
         
     # Set to update value of Up Down Servo slider
     def set_upDownSlider(self, string, newNum):
@@ -287,18 +268,18 @@ class QServoTrackPadThread(QThread):
            
             # set for upDownSlider servo to move
             if self.upDownSlider != False:        
-                self.upDownMotor.angle = self.upDownValue
+                #self.upDownMotor.angle = self.upDownValue
                 self.upDownDONE(self.upDownValue)
                 self.upDownSlider = False
             
             # set for leftRight servo to move
             if self.leftRightSlider != False:        
-                self.leftRightMotor.angle = self.leftRightValue 
+               # self.leftRightMotor.angle = self.leftRightValue 
                 self.leftRightDONE(self.leftRightValue)
                 self.leftRightSlider = False
                 
             if(self.exitProgram == True):
-                #self.hat.deinit() # To stop using pca9685
+               # self.hat.deinit() # To stop using pca9685
                 self.exitProgram = False
                 break
 

@@ -16,10 +16,12 @@ from RPICam_GUI_Settings import WebStream_Button, Brightness_Slider, Contrast_Sl
 from RPI_Capture_Thread import QRPICaptureThread
 from RPI_Record_Thread import QRPIRecordVideoThread, QPBarThread
 from RPI_TimeLapse_Thread import QRPITimeLapseThread
-#~ from RPI_StreamThread import QRPIVideoStreamThread
+
 from Handlers import Button_Reset_Handler, Error_Handler
-from StreamWindow import Stream_Video
-from RPI_StreamThreadv2 import QRPIVideoStreamThread
+#from StreamWindow import Stream_Video
+from StreamWindow_Zero import Stream_Video
+#from RPI_StreamThreadv2 import QRPIVideoStreamThread
+from RPI_StreamThread import QRPIVideoStreamThread
 from RPI_Slider_Thread import QSliderThread
 from RPI_DropDown_Thread import QDropDownThread
 from Sleeper_Thread import QTimeThread
@@ -95,12 +97,8 @@ class Window(QMainWindow):
         
         # Initialize Servo for PiCamera
         PiServo = Initialize_Servo()
-        self.upDownMotor = PiServo.upDownMotor
-        self.leftRightMotor = PiServo.leftRightMotor
-        
-        # Initalize at center position
-        self.leftRightMotor.angle = horizontal_pos
-        self.upDownMotor.angle = vertical_pos
+        PiServo.pwm.setServoPulse(0,1500)
+        PiServo.pwm.setServoPulse(1,1500)
 
         # --------------------------------------------------------------
         # ---------------- Instantiate All Threads  --------------------
@@ -115,8 +113,8 @@ class Window(QMainWindow):
         self.sliderThread = QSliderThread(self.camera)
         self.dropdownThread = QDropDownThread(self.camera)
         self.servoTrackpadThread = QServoTrackPadThread(PiServo, horizontal_pos, vertical_pos)
-        self.leftRightServoThread = QServoHorizontalThread(PiServo, horizontal_pos, vertical_pos)
-        self.upDownServoThread = QServoVerticalThread(PiServo, horizontal_pos, vertical_pos)
+        self.leftRightServoThread = QServoHorizontalThread(PiServo, horizontal_pos)
+        self.upDownServoThread = QServoVerticalThread(PiServo, vertical_pos)
         
         # --------------------------------------------------------------
         # ---------------- Start All Threads ---------------------------
@@ -461,13 +459,13 @@ class Window(QMainWindow):
         self.xHorizontal = QLabel()
         self.xHorizontal.setMinimumSize(50, 12)
         self.xHorizontal.setStyleSheet(GUI_Style.statusBar_XY)
-        self.xHorizontal.setText("| X: 90")
+        self.xHorizontal.setText("| X: 1500")
         self.xHorizontal.setAlignment(Qt.AlignCenter)
         
         self.yVertical = QLabel()
         self.yVertical.setMinimumSize(50, 12)
         self.yVertical.setStyleSheet(GUI_Style.statusBar_XY)
-        self.yVertical.setText("| Y: 90")
+        self.yVertical.setText("| Y: 1500")
         self.yVertical.setAlignment(Qt.AlignCenter)
         
         self.res = QLabel()
