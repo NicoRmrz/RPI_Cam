@@ -25,14 +25,15 @@ from RPI_DropDown_Thread import QDropDownThread
 from Sleeper_Thread import QTimeThread
 from web_stream import WebStream_Thread
 from GUI_Stylesheets import GUI_Stylesheets
-from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
+#from RPI_Servo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
+from RPI_ZeroServo import Initialize_Servo, QServoTrackPadThread, QServoHorizontalThread, QServoVerticalThread
 
 # Current version of application - Update for new builds
 appVersion = "2.3"      # Update version
 
 #Initial postion of servos
-horizontal_pos = 90
-vertical_pos = 90
+horizontal_pos = 1500
+vertical_pos = 1500
 
 # Icon Image locations
 Main_path = os.getcwd() + "/"     
