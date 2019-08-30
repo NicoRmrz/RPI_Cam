@@ -90,7 +90,7 @@ class Window(QMainWindow):
         # --------------------------------------------------------------  
         # Initialize Pi Camera for all threads
         PiCam = Setup_PiCam()
-        self.camera, self.rawCapture = PiCam.PiCam_Configuration() 
+        self.camera, self.rawCapture, self.camLED = PiCam.PiCam_Configuration() 
         
         # Initialize Servo for PiCamera
         PiServo = Initialize_Servo()
