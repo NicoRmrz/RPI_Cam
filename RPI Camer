@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=RPI Camera
+Comment=My application which does this
+Icon=/home/pi/Desktop/RPI_Cam/Icon_Image/logo_icon_white.png
+Exec=bash /home/pi/Desktop/openApp.sh
+Type=Application
+Encoding=UTF-8
+Categories=None;
