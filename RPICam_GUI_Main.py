@@ -393,7 +393,9 @@ class Window(QMainWindow):
         self.allHandlers()
         
         # Display GUI Objects
-        self.show()
+        #~ self.show()
+        #~ self.showFullScreen()
+        self.showMaximized()
         
     # ------------------------------------------------------------------
     # ------ Function for camera servo controls via keyboard keys ------
