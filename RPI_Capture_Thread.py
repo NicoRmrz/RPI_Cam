@@ -84,7 +84,8 @@ class QRPICaptureThread(QThread):
 								# PiCam Stream Text
 								self.camera.annotate_background = Color('blue')
 								self.camera.annotate_foreground = Color('white')
-								self.camera.annotate_text = ("Captured Image \n" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+								ts = datetime.datetime.now().strftime("%d %B %Y %I:%M:%S%p")
+								self.camera.annotate_text = (ts)
 
 								# Save image with timestamp
 								currentTime = time.strftime('%Y-%m-%d__%H_%M_%S')
