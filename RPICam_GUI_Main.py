@@ -32,7 +32,7 @@ appVersion = "2.3"      # Update version
 
 #Initial postion of servos
 horizontal_pos = 90
-vertical_pos = 90
+vertical_pos = 165
 
 # Icon Image locations
 Main_path = os.getcwd() + "/"     
@@ -90,7 +90,7 @@ class Window(QMainWindow):
         # --------------------------------------------------------------  
         # Initialize Pi Camera for all threads
         PiCam = Setup_PiCam()
-        self.camera, self.rawCapture = PiCam.PiCam_Configuration() 
+        self.camera, self.rawCapture, self.camLED = PiCam.PiCam_Configuration() 
         
         # Initialize Servo for PiCamera
         PiServo = Initialize_Servo()
@@ -144,7 +144,7 @@ class Window(QMainWindow):
         # -------------------------------------------------------------- 
         self.MyTabs = QTabWidget()
         self.MyTabs.setStyleSheet(GUI_Style.tabs)
-        self.MyTabs.setMaximumWidth(400)
+        self.MyTabs.setMaximumWidth(500)
         
         # Create each individual tabs
         self.MainTab = QWidget()
@@ -158,7 +158,7 @@ class Window(QMainWindow):
         self.MyTabs.addTab(self.ServoFreelookTab, QIcon(Freelook_Path), '') 
         self.MyTabs.addTab(self.ServoControllerTab, QIcon(ServoController_Tab_Path), '') 
         self.MyTabs.addTab(self.SettingsTab,QIcon(Settings_Tab_Path), '')   
-        self.MyTabs.setIconSize(QSize(30, 40))
+        self.MyTabs.setIconSize(QSize(40, 50))
         
         # --------------------------------------------------------------
         # -------------- Create Bottom Status Bar-----------------------
@@ -181,21 +181,22 @@ class Window(QMainWindow):
         self.MainTitle()
         
         # Add title and logo to layout
-        Main_Title_Layout.addWidget(self.Logo_btn)
-        Main_Title_Layout.addWidget(self.UpperText, 0, Qt.AlignCenter)
-        Main_Title_Layout.setSpacing(10)
+        Main_Title_Layout.addWidget(self.Logo_btn, 0, Qt.AlignCenter)
+        Main_Title_Layout.addWidget(self.UpperText, 1, Qt.AlignLeft)
+        Main_Title_Layout.setSpacing(30)
+        Main_Title_Layout.setContentsMargins(0, 10, 0, 0) 
         
         # Add GUI object to left side of GUI window
         Main_Window_VLayout.addLayout(Main_Title_Layout)
         Main_Window_VLayout.addWidget(self.MyTabs) 
         Main_Window_VLayout.addWidget(self.LargeTextBox)
-        Main_Window_VLayout.setSpacing(20)
+        Main_Window_VLayout.setSpacing(30)
         
         # Add tabs and video stream to main window layout
         Main_Window_HLayout.addLayout(Main_Window_VLayout)       
         Main_Window_HLayout.addWidget(self.Vid_Stream)       
-        Main_Window_HLayout.setSpacing(20)     
-        Main_Window_HLayout.setContentsMargins(20, 20, 20, 20)    
+        Main_Window_HLayout.setSpacing(10)     
+        Main_Window_HLayout.setContentsMargins(20, 0, 0, 0)    
                 
         # --------------------------------------------------------------
         # ------------- Create Home Tab --------------------------------
@@ -227,11 +228,15 @@ class Window(QMainWindow):
         # ------------- Create Free Movement Tab -----------------------
         # --------------------------------------------------------------
         # Instantiate Servo GUI Objects 
-        self.mouseTracker()
+        self.mouseTrackerr()
         
         # Create Layout to go on frelook Tab
         vertical_servo_layout = QVBoxLayout()
+        #~ self.mouseTracker.setMaximumWidth((vertical_servo_layout))
         vertical_servo_layout.addWidget(self.mouseTracker)
+        vertical_servo_layout.setContentsMargins(20, 0, 0, 0)
+
+        
 
         # Add layout to frelook tab 
         self.ServoFreelookTab.setLayout(vertical_servo_layout)
@@ -393,7 +398,9 @@ class Window(QMainWindow):
         self.allHandlers()
         
         # Display GUI Objects
-        self.show()
+        #~ self.show()
+        #~ self.showFullScreen()
+        self.showMaximized()
         
     # ------------------------------------------------------------------
     # ------ Function for camera servo controls via keyboard keys ------
@@ -419,7 +426,7 @@ class Window(QMainWindow):
     # Create Main Title Text
     def MainTitle(self):
         self.UpperText = QLabel(self)
-        self.UpperText.setText("RPI Cam Controller")
+        self.UpperText.setText("RPI Controller")
         self.UpperText.setStyleSheet(GUI_Style.mainTitle)
         
     # Create Main Logo Button
@@ -429,12 +436,12 @@ class Window(QMainWindow):
         self.Logo_btn.pressed.connect(self.Logo_btn.On_Click)
         self.Logo_btn.released.connect(self.Logo_btn.Un_Click)
         self.Logo_btn.setIcon(QIcon(Logo_Path))
-        self.Logo_btn.setIconSize(QSize(65, 70))
+        self.Logo_btn.setIconSize(QSize(65, 80))
 
     # Create Window to stream live feed
     def VideoStream(self):
         self.Vid_Stream = Stream_Video(self, self.Video_Stream, self.RPIRecordThread, self.RPICaptureThread, self.RPITimeLapseThread)
-        self.Vid_Stream.setMinimumSize(800, 480)
+        self.Vid_Stream.setMinimumSize(1400, 800)
         self.Vid_Stream.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.Vid_Stream.setBackgroundRole(QPalette.Base)
         self.Vid_Stream.setScaledContents(True)
@@ -456,21 +463,22 @@ class Window(QMainWindow):
     def StatusBar(self):
         self.statusBar = QStatusBar()
         self.statusBar.setStyleSheet(GUI_Style.statusBarWhite)
+        self.statusBar.setMinimumSize(40, 50)
         
         self.xHorizontal = QLabel()
-        self.xHorizontal.setMinimumSize(50, 12)
+        self.xHorizontal.setMinimumSize(50, 50)
         self.xHorizontal.setStyleSheet(GUI_Style.statusBar_XY)
         self.xHorizontal.setText("| X: 90")
         self.xHorizontal.setAlignment(Qt.AlignCenter)
         
         self.yVertical = QLabel()
-        self.yVertical.setMinimumSize(50, 12)
+        self.yVertical.setMinimumSize(50, 50)
         self.yVertical.setStyleSheet(GUI_Style.statusBar_XY)
-        self.yVertical.setText("| Y: 90")
+        self.yVertical.setText("| Y: 15")
         self.yVertical.setAlignment(Qt.AlignCenter)
         
         self.res = QLabel()
-        self.res.setMinimumSize(50, 15)
+        self.res.setMinimumSize(50, 50)
         self.res.setStyleSheet(GUI_Style.statusBar_widgets)
         self.res.setText("| res 1280x720")
         self.res.setAlignment(Qt.AlignCenter)
@@ -491,7 +499,7 @@ class Window(QMainWindow):
         self.snpsht_btn.pressed.connect(self.snpsht_btn.On_Click)
         self.snpsht_btn.released.connect(self.snpsht_btn.Un_Click)
         self.snpsht_btn.setIcon(QIcon(Camera_Idle_Path))
-        self.snpsht_btn.setIconSize(QSize(65, 70))
+        self.snpsht_btn.setIconSize(QSize(100, 100))
 
     # Creating button for recording video
     def Record_Btn_GUI(self):
@@ -500,7 +508,7 @@ class Window(QMainWindow):
         self.rec_btn.pressed.connect(self.rec_btn.On_Click)
         self.rec_btn.released.connect(self.rec_btn.Un_Click)
         self.rec_btn.setIcon(QIcon(Video_Idle_Path))
-        self.rec_btn.setIconSize(QSize(80, 80))
+        self.rec_btn.setIconSize(QSize(120, 120))
         
     # Creating button for recording video
     def TimeLapse_Btn_GUI(self):
@@ -509,7 +517,7 @@ class Window(QMainWindow):
         self.Time_Lapse_btn.pressed.connect(self.Time_Lapse_btn.On_Click)
         self.Time_Lapse_btn.released.connect(self.Time_Lapse_btn.Un_Click)
         self.Time_Lapse_btn.setIcon(QIcon(TimeLapse_Idle_Path))
-        self.Time_Lapse_btn.setIconSize(QSize(60, 60))
+        self.Time_Lapse_btn.setIconSize(QSize(90, 90))
 
     # Creating button for recording video
     def Stop_Btn_GUI(self):
@@ -518,7 +526,7 @@ class Window(QMainWindow):
         self.stp_rec_btn.pressed.connect(self.stp_rec_btn.On_Click)
         self.stp_rec_btn.released.connect(self.stp_rec_btn.Un_Click) 
         self.stp_rec_btn.setIcon(QIcon(Stop_Idle_Path))
-        self.stp_rec_btn.setIconSize(QSize(60, 60))
+        self.stp_rec_btn.setIconSize(QSize(90, 90))
 
     # Create Progress Bar
     def Progress_Bar(self):
@@ -549,6 +557,8 @@ class Window(QMainWindow):
         self.webStream_Btn.setStyleSheet(GUI_Style.webButton)
         self.webStream_Btn.pressed.connect(self.webStream_Btn.On_Click)
         self.webStream_Btn.released.connect(self.webStream_Btn.Un_Click) 
+        self.webStream_Btn.setMaximumHeight(40)
+        
         #~ self.webStream_Btn.setIcon(QIcon(Stop_Idle_Path))
         #~ self.webStream_Btn.setIconSize(QSize(60, 60))
         #~ self.webStream_Btn.setSize(60, 60)
@@ -758,7 +768,7 @@ class Window(QMainWindow):
     # --------- Free Movement Tab GUI Objects Functions ----------------
     # ------------------------------------------------------------------  
     # To create a mouse pad for camera freelook
-    def mouseTracker(self):
+    def mouseTrackerr(self):
         self.mouseTracker = MouseTracker(self, self.leftRightServoThread, self.upDownServoThread)
         self.mouseTracker.setMaximumSize(360, 340)
         self.mouseTracker.setStyleSheet(GUI_Style.mouseTrackPad)
@@ -773,7 +783,7 @@ class Window(QMainWindow):
         self.left_btn.setStyleSheet(GUI_Style.startButton)
         self.left_btn.pressed.connect(self.left_btn.On_Click)
         self.left_btn.setIcon(QIcon(Left_Button_Path))
-        self.left_btn.setIconSize(QSize(65, 70))
+        self.left_btn.setIconSize(QSize(125, 125))
         
     # To create button for right click events
     def rightButton(self):
@@ -781,7 +791,7 @@ class Window(QMainWindow):
         self.right_btn.setStyleSheet(GUI_Style.startButton)
         self.right_btn.pressed.connect(self.right_btn.On_Click)
         self.right_btn.setIcon(QIcon(Right_Button_Path))
-        self.right_btn.setIconSize(QSize(65, 70))
+        self.right_btn.setIconSize(QSize(125, 125))
         
     # To create button for up click events
     def upButton(self):
@@ -789,7 +799,7 @@ class Window(QMainWindow):
         self.up_btn.setStyleSheet(GUI_Style.startButton)
         self.up_btn.pressed.connect(self.up_btn.On_Click)
         self.up_btn.setIcon(QIcon(Up_Button_Path))
-        self.up_btn.setIconSize(QSize(65, 70))
+        self.up_btn.setIconSize(QSize(125, 125))
         
     # To create button for down click events
     def downButton(self):
@@ -797,7 +807,7 @@ class Window(QMainWindow):
         self.down_btn.setStyleSheet(GUI_Style.startButton)
         self.down_btn.pressed.connect(self.down_btn.On_Click)
         self.down_btn.setIcon(QIcon(Down_Button_Path))
-        self.down_btn.setIconSize(QSize(65, 70))
+        self.down_btn.setIconSize(QSize(125, 125))
 
     # ------------------------------------------------------------------
     # ----------- Close All Threads at app closure ---------------------

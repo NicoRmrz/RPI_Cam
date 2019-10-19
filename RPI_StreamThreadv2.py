@@ -46,21 +46,25 @@ class QRPIVideoStreamThread(QThread):
 			#Set Video Stream to GUI Qlabel
 			if (self.VideoStream_Ready != False):
 				try:
-					# PiCam Stream configuration
-					self.camera.annotate_foreground = Color('black')
-					ts = datetime.datetime.now().strftime("%d %B %Y %I:%M:%S%p")
-					self.camera.annotate_text = ("RPI Cam: " + ts)
-					self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
+					#~ # PiCam Stream configuration
+					#~ self.camera.annotate_foreground = Color('black')
+					#~ ts = datetime.datetime.now().strftime("%d %B %Y %I:%M:%S%p")							
+					#~ self.camera.annotate_text = ("RPI Cam: " + ts)
+					#~ self.camera.annotate_background = Color.from_rgb_bytes(152, 251, 152) 
 				
-					# If motion detection is checked 
+					# If motion detection is selected 
 					self.motionDetection()
 					
 				except PiCameraValueError as e:
 					print(e)
+					self.SendError(str(e))
 					self.SendError("Stream Error.. Try Again!")	
+					self.VideoStream_Ready = True
+
 							
 				except PiCameraRuntimeError as e:
 					print(e)
+					self.SendError(str(e))	
 					self.SendError("Stream Error.. Try Again!")	
 					self.VideoStream_Ready = True
 			
